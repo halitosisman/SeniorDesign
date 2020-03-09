@@ -101,8 +101,8 @@ void ili_init() {
     disp_on.data.small[0] = 0x0;
     disp_on.tag = ONE_BYTE_CMD;
 
-    mem_write.data.bulk = blah;
-    mem_write.tag = sizeof(blah);
+    //mem_write.data.bulk = blah;
+   // mem_write.tag = sizeof(blah);
 
     ILI_write(reset);
     vTaskDelay(pdMS_TO_TICKS(5));
@@ -118,5 +118,5 @@ void ili_init() {
     ILI_write(disp_on);
     vTaskDelay(pdMS_TO_TICKS(500));
 
-    ILI_write(mem_write);
+    //ILI_write(mem_write);
 }

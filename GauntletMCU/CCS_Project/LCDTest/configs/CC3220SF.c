@@ -293,15 +293,15 @@ const GPIOCC32XX_Config GPIOCC32XX_config = {
  * acceptable to have more SD driver instances than SDFatFs driver instances
  * but the opposite is not supported & the SDFatFs will fail to open.
  */
-SDFatFS_Object sdfatfsObjects[CC3220SF_LAUNCHXL_SDFatFSCOUNT];
+SDFatFS_Object sdfatfsObjects[1];
 
-const SDFatFS_Config SDFatFS_config[CC3220SF_LAUNCHXL_SDFatFSCOUNT] = {
+const SDFatFS_Config SDFatFS_config[1] = {
     {
-        .object = &sdfatfsObjects[CC3220SF_LAUNCHXL_SDFatFS0]
+        .object = &sdfatfsObjects[0]
     }
 };
 
-const uint_least8_t SDFatFS_count = CC3220SF_LAUNCHXL_SDFatFSCOUNT;
+const uint_least8_t SDFatFS_count = 1;
 
 
 /*
@@ -333,8 +333,8 @@ const SD_Config SD_config[1] = {
     /* CONFIG_SD_0 */
     {
         .fxnTablePtr = &sdHostCC32XX_fxnTable,
-        .object = &sdhostObjects[CONFIG_SD_0],
-        .hwAttrs = &sdhostHWattrs[CONFIG_SD_0]
+        .object = &sdhostObjects[0],
+        .hwAttrs = &sdhostHWattrs[0]
     },
 };
 

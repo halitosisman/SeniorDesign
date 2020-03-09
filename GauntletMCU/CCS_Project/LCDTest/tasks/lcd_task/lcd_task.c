@@ -72,15 +72,66 @@ void write8(uint8_t val) {
     *wrx = 0x0;
 }
 
+
+int32_t fatfs_getFatTime(void) {
+    return 0;
+}
+
+
 void lcd_task(void * par) {
     GPIO_init();
 
+#if 0
+#define
     *wrx = 0x0;
     *data_03 = 0x0;
     *data_47 = 0x0;
 
     ili_init();
     lcd_clear();
+#endif
+
+    FIL* fp;
+
+    SDFatFS_init();
+    SDFatFS_open(0, 0);
+
+    FRESULT r = f_open(fp, "test.c", (BYTE) 'w');
+    if (!r) {
+        while (1) {
+        }
+
+    }
+    char in[] = "Hello, World!";
+    char out[20];
+    UINT bw;
+    UINT btw = sizeof(in);
+    r = f_write(fp, in, btw, &bw);
+    if (!r) {
+        while (1) {
+        }
+
+    }
+
+    r = f_close(fp);
+    if (!r) {
+        while (1) {
+        }
+
+    }
+
+    r = f_open(fp, "test.c", (BYTE) 'r');
+    if (!r) {
+        while (1) {
+        }
+
+    }
+    r = f_write(fp, in, btw, &bw);
+    if (!r) {
+        while (1) {
+        }
+
+    }
 
     while (1) {
     }

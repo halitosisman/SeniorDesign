@@ -27,7 +27,7 @@ extern LCD_CMD_t cl_set;
 extern LCD_CMD_t mem_write;
 
 
-void set_draw_window(int16_t lX, int16_t lY, );
+//void set_draw_window(int16_t lX, int16_t lY, );
 void lcd_init();
 void lcd_clear();
 

@@ -15,7 +15,11 @@
 #include "pthread.h"
 #include "configs/Board.h"
 
+#include <third_party/fatfs/ff.h>
+#include <third_party/fatfs/diskio.h>
+
 #include <ti/drivers/GPIO.h>
+#include <ti/drivers/SDFatFS.h>
 
 #include <ti/devices/cc32xx/inc/hw_types.h>
 #include <ti/devices/cc32xx/driverlib/gpio.h>
@@ -50,6 +54,9 @@
 #define
 extern "C" {
 #endif
+
+
+int32_t fatfs_getFatTime(void);
 
 
 /*!

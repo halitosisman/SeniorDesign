@@ -26,6 +26,8 @@ static Graphics_Display wrist_display =
      .width = LCD_COLUMNS
 };
 
+#if 0
+#define
 Graphics_Context wrist_context =
 {
      .background = 0,
@@ -35,7 +37,7 @@ Graphics_Context wrist_context =
      .size = sizeof(Graphics_Context),
      .display = wrist_display
 };
-
+#endif
 
 void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue) {
     mem_write.tag = NO_CMD;
