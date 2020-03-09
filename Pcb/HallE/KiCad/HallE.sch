@@ -1,0 +1,142 @@
+EESchema Schematic File Version 4
+EELAYER 29 0
+EELAYER END
+$Descr User 16774 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	7450 3500 7450 3300
+Wire Wire Line
+	7450 3300 7450 3200
+Wire Wire Line
+	7450 3200 7450 3100
+Wire Wire Line
+	7450 3100 7450 2950
+Wire Wire Line
+	7100 3100 7450 3100
+Wire Wire Line
+	7100 3200 7450 3200
+Wire Wire Line
+	7100 3300 7450 3300
+Connection ~ 7450 3100
+Connection ~ 7450 3200
+Connection ~ 7450 3300
+Text Label 7450 3500 0    10   ~ 0
+GND
+Wire Wire Line
+	8400 2400 8600 2400
+Text Label 8500 2400 0    70   ~ 0
+GND
+Wire Wire Line
+	8400 2500 8600 2500
+Text Label 8500 2500 0    70   ~ 0
+GND
+Wire Wire Line
+	6000 3200 5600 3200
+Text Label 5650 3200 0    70   ~ 0
+GND
+Wire Wire Line
+	8400 2800 8600 2800
+Text Label 8500 2800 0    70   ~ 0
+GND
+Wire Wire Line
+	6000 3300 5450 3300
+Wire Wire Line
+	7450 2650 5450 2650
+Wire Wire Line
+	5450 2650 5450 3300
+Text Label 5650 3300 0    70   ~ 0
+VCC
+Connection ~ 5450 3300
+Wire Wire Line
+	8400 2600 8600 2600
+Text Label 8500 2600 0    70   ~ 0
+VCC
+Wire Wire Line
+	6000 3100 5600 3100
+Text Label 5650 3100 0    70   ~ 0
+OUT
+Wire Wire Line
+	8400 2300 8600 2300
+Text Label 8500 2300 0    70   ~ 0
+OUT
+$Comp
+L HallE-eagle-import:C-USC0805 C1
+U 1 1 09ADF4B9
+P 7450 2750
+F 0 "C1" H 7490 2775 59  0000 L BNN
+F 1 "100nF" H 7490 2585 59  0000 L BNN
+F 2 "HallE:C0805" H 7450 2750 50  0001 C CNN
+F 3 "" H 7450 2750 50  0001 C CNN
+	1    7450 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L HallE-eagle-import:A3L-LOC #FRAME2
+U 1 1 B9163575
+P 900 6000
+F 0 "#FRAME2" H 900 6000 50  0001 C CNN
+F 1 "A3L-LOC" H 900 6000 50  0001 C CNN
+F 2 "" H 900 6000 50  0001 C CNN
+F 3 "" H 900 6000 50  0001 C CNN
+	1    900  6000
+	1    0    0    -1  
+$EndComp
+$Comp
+L HallE-eagle-import:VCC #SUPPLY01
+U 1 1 F54A36B8
+P 5450 3300
+F 0 "#SUPPLY01" H 5450 3300 50  0001 C CNN
+F 1 "VCC" H 5450 3410 59  0000 C BNN
+F 2 "" H 5450 3300 50  0001 C CNN
+F 3 "" H 5450 3300 50  0001 C CNN
+	1    5450 3300
+	-1   0    0    1   
+$EndComp
+$Comp
+L HallE-eagle-import:GND #GND01
+U 1 1 8DA2BB24
+P 7450 3600
+F 0 "#GND01" H 7450 3600 50  0001 C CNN
+F 1 "GND" H 7450 3590 59  0000 C TNN
+F 2 "" H 7450 3600 50  0001 C CNN
+F 3 "" H 7450 3600 50  0001 C CNN
+	1    7450 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L HallE-eagle-import:AH8503 U$1
+U 1 1 89E33A62
+P 6600 3200
+F 0 "U$1" H 6600 3200 50  0001 C CNN
+F 1 "AH8503" H 6600 3200 50  0001 C CNN
+F 2 "HallE:UDFN-6" H 6600 3200 50  0001 C CNN
+F 3 "" H 6600 3200 50  0001 C CNN
+	1    6600 3200
+	1    0    0    -1  
+$EndComp
+$Comp
+L HallE-eagle-import:503480-0400 J1
+U 1 1 449C7C68
+P 8000 2500
+F 0 "J1" H 7799 2840 59  0000 L BNN
+F 1 "503480-0400" H 7799 1999 59  0000 L BNN
+F 2 "HallE:MOLEX_503480-0400" H 8000 2500 50  0001 C CNN
+F 3 "" H 8000 2500 50  0001 C CNN
+	1    8000 2500
+	1    0    0    -1  
+$EndComp
+Text Notes 14650 5200 0    59   ~ 0
+Hall Effect Sensor PCB
+Text Notes 6150 3000 0    59   ~ 0
+Hall Effect Sensor
+$EndSCHEMATC
