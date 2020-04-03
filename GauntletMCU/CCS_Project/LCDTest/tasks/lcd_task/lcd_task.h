@@ -26,25 +26,14 @@
 
 #include <ti/drivers/Board.h>
 #include <ti/drivers/gpio/GPIOCC32XX.h>
-#include <ti/devices/cc32xx/inc/hw_gpio.h>
-#include <ti/devices/cc32xx/inc/hw_memmap.h>
 #include <ti/devices/cc32xx/inc/hw_apps_rcm.h>
 #include <ti/devices/cc32xx/inc/hw_ocp_shared.h>
 
 #include "tasks/FGtask.h"
-#include "drivers/LCD/ILI9341.h"
-#include "drivers/LCD/lcd.h"
+#include "drivers/LCD/FG_graphics.h"
 
 #define SL_TASK_STACK_SIZE 2048 // copied from TI's tcpecho example
 #define SPAWN_TASK_PRIORITY 9 // also copied from TI's tcpecho example
-
-#define LCD_DBUS_HIGH (GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7)
-#define LCD_DBUS_LOW (GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3)
-
-#define LCD_D74_MSK 0x3c0
-#define LCD_D30_MSK 0x3c
-#define LCD_WRX_MSK 0x4
-#define LCD_DCX_MSK 0x20
 
 
 #ifndef TASKS_LCD_TASK_LCD_TASK_H_

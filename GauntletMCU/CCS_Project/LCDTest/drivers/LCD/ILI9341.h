@@ -24,6 +24,11 @@ extern "C" {
  *  These defines ripped from https://github.com/adafruit/TFTLCD-Library/blob/master/registers.h
  */
 
+#define ILI9341_BITS_PER_RED 5
+#define ILI9341_BITS_PER_GREEN 6
+#define ILI9341_BITS_PER_BLUE 5
+
+
 #define ILI9341_SOFTRESET 0x01
 #define ILI9341_SLEEPIN 0x10
 #define ILI9341_SLEEPOUT 0x11
@@ -58,11 +63,6 @@ extern "C" {
 #define DCX_CMD 0x0
 #define DCX_DATA 0xFF
 
-#define NO_CMD 0
-#define ONE_BYTE_CMD 1
-#define TWO_BYTE_CMD 2
-#define FOUR_BYTE_CMD 4
-
 typedef uint8_t tag_t;
 
 
@@ -72,7 +72,7 @@ typedef uint8_t tag_t;
  *  Note that small style transactions are MSB first and bulk transactions are LSB
  *
  */
-typedef struct _LCD_CMD {
+typedef struct _LCD_CFG {
     /*  Determines the category of transaction.  */
     tag_t tag;
 
@@ -80,18 +80,8 @@ typedef struct _LCD_CMD {
     uint8_t cmd;
 
     /* command parameters */
-    union _data {
-        /*
-            Pointer to large quantity of data used for very large transactions. tag = number of bytes to write.
-        */
-        uint8_t * bulk;
-
-        /*
-            Value type data for small transactions.
-        */
-        uint8_t small[4];
-    } data;
-} LCD_CMD_t;
+    uint8_t data[4];
+} LCD_CFG;
 
 
 /*!
@@ -108,8 +98,8 @@ typedef struct _LCD_CMD {
 
 */
 void write8(uint8_t val);
-void FG_write_bulk(uint8_t * buf, uint16_t cnt);
-void FG_write_color(uint8_t * color, uint8_t color_len, int num);
+void ILI_write_bulk(uint8_t * buf, uint16_t cnt);
+void ILI_write_color(uint8_t * color, uint8_t color_len, int num);
 
 
 /*!
@@ -129,7 +119,7 @@ inline void set_dcx(uint8_t val);
 
 
 /*!
-    \brief          ILI_write
+    \brief          ILI_cfg
 
     More efficient routine for writing command - parameter sequences
 
@@ -140,22 +130,7 @@ inline void set_dcx(uint8_t val);
     \note
 
 */
-void ILI_write(LCD_CMD_t transaction);
-
-
-/*!
-    \brief          ili_init
-
-    Initialize the display connected to the ILI9341 chip set.
-
-    \param          void
-
-    \return         void
-
-    \note           Requires GPIOs to be initialized.
-
-*/
-void ili_init();
+void ILI_cfg(LCD_CFG setting);
 
 
 #ifdef _cplusplus

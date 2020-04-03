@@ -358,6 +358,23 @@ C 0 0 50 1 0 10 N
 ENDDRAW
 ENDDEF
 #
+# Display-eagle-import_TPTP09R
+#
+DEF Display-eagle-import_TPTP09R TP 0 40 Y Y 1 L N
+F0 "TP" -50 50 59 H V L BNN
+F1 "Display-eagle-import_TPTP09R" 0 0 50 H I C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+T 0 50 -50 59 0 1 0 >TP_SIGNAL_NAME Normal 0 L B
+P 2 1 0 0 -30 -30 0 0 N
+P 2 1 0 0 0 -60 -30 -30 N
+P 2 1 0 0 0 0 30 -30 N
+P 2 1 0 0 30 -30 0 -60 N
+X TP TP 0 -100 100 U 0 0 1 0 I
+ENDDRAW
+ENDDEF
+#
 # Display-eagle-import_VCC
 #
 DEF Display-eagle-import_VCC #SUPPLY 0 40 Y Y 1 L P

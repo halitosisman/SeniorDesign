@@ -1,5 +1,5 @@
 EESchema Schematic File Version 4
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr User 16834 9698
 encoding utf-8
@@ -132,10 +132,6 @@ Connection ~ 5800 5000
 Text Label 6100 4700 0    10   ~ 0
 GND
 Wire Wire Line
-	6100 3000 5900 3000
-Text Label 6100 3000 0    10   ~ 0
-GND
-Wire Wire Line
 	7900 4900 8500 4900
 Wire Wire Line
 	8500 4900 8500 5000
@@ -229,12 +225,12 @@ Wire Wire Line
 Text Label 9500 4300 0    70   ~ 0
 I2C_SDA
 Wire Wire Line
-	6100 2900 5500 2900
-Text Label 5600 2900 0    70   ~ 0
-I2C_INT
-Wire Wire Line
 	9100 4400 10300 4400
 Text Label 9500 4400 0    70   ~ 0
+I2C_INT
+Wire Wire Line
+	5700 2900 5500 2900
+Text Label 5600 2900 0    70   ~ 0
 I2C_INT
 Wire Wire Line
 	6100 4300 5800 4300
@@ -463,29 +459,25 @@ Wire Wire Line
 Text Label 9700 4800 0    70   ~ 0
 DCX
 Wire Wire Line
-	7900 4700 8800 4700
-Wire Wire Line
-	8800 4700 8800 4900
-Wire Wire Line
 	9100 3600 10700 3600
 Wire Wire Line
-	10700 3600 10700 4900
+	10700 3600 10700 5000
 Wire Wire Line
-	8800 4900 10700 4900
-Text Label 9700 4900 0    70   ~ 0
-RDX
+	8600 5000 10700 5000
 Wire Wire Line
-	7900 4800 8700 4800
+	8600 5000 8600 4800
 Wire Wire Line
-	8700 4800 8700 5000
+	8600 4800 7900 4800
+Wire Wire Line
+	8700 4700 8700 4900
 Wire Wire Line
 	9100 3700 10600 3700
 Wire Wire Line
-	10600 3700 10600 5000
+	10600 3700 10600 4900
 Wire Wire Line
-	8700 5000 10600 5000
-Text Label 9700 5000 0    70   ~ 0
-WRX
+	8700 4900 10600 4900
+Wire Wire Line
+	8700 4700 7900 4700
 Wire Wire Line
 	9500 5500 9500 5700
 Wire Wire Line
@@ -521,6 +513,17 @@ Wire Wire Line
 	8300 2500 7900 2500
 Wire Wire Line
 	8000 2400 7900 2400
+Wire Wire Line
+	6100 2400 5200 2400
+Wire Wire Line
+	5200 2400 5000 2400
+Wire Wire Line
+	5200 2400 5200 3000
+Wire Wire Line
+	5200 3000 6100 3000
+Connection ~ 5200 2400
+Text Label 5200 2500 0    70   ~ 0
+RST
 $Comp
 L Display-eagle-import:A3L-LOC #FRAME1
 U 1 1 8880E89B
@@ -597,17 +600,6 @@ F 2 "Display:M0805" H 3600 3700 50  0001 C CNN
 F 3 "" H 3600 3700 50  0001 C CNN
 	1    3600 3700
 	0    -1   -1   0   
-$EndComp
-$Comp
-L Display-eagle-import:GND #GND040
-U 1 1 2B74A96F
-P 5900 3100
-F 0 "#GND040" H 5900 3100 50  0001 C CNN
-F 1 "GND" H 5900 3090 59  0000 C TNN
-F 2 "" H 5900 3100 50  0001 C CNN
-F 3 "" H 5900 3100 50  0001 C CNN
-	1    5900 3100
-	1    0    0    -1  
 $EndComp
 $Comp
 L Display-eagle-import:GND #GND041
@@ -1113,6 +1105,50 @@ F 1 "10" H 8550 2570 59  0000 L BNN
 F 2 "Display:R0805" H 8500 2500 50  0001 C CNN
 F 3 "" H 8500 2500 50  0001 C CNN
 	1    8500 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Display-eagle-import:R-US_R0805 R14
+U 1 1 2C7B912C
+P 5200 2200
+F 0 "R14" H 5050 2259 59  0000 L BNN
+F 1 "10" H 5250 2270 59  0000 L BNN
+F 2 "Display:R0805" H 5200 2200 50  0001 C CNN
+F 3 "" H 5200 2200 50  0001 C CNN
+	1    5200 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L Display-eagle-import:VCC #SUPPLY03
+U 1 1 4F8E092B
+P 5200 2000
+F 0 "#SUPPLY03" H 5200 2000 50  0001 C CNN
+F 1 "VCC" H 5200 2110 59  0000 C BNN
+F 2 "" H 5200 2000 50  0001 C CNN
+F 3 "" H 5200 2000 50  0001 C CNN
+	1    5200 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Display-eagle-import:TPTP09R TP1
+U 1 1 FE5B29FD
+P 4900 2400
+F 0 "TP1" H 4850 2450 59  0000 L BNN
+F 1 "TPTP09R" H 4900 2400 50  0001 C CNN
+F 2 "Display:TP09R" H 4900 2400 50  0001 C CNN
+F 3 "" H 4900 2400 50  0001 C CNN
+	1    4900 2400
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Display-eagle-import:R-US_R0805 R15
+U 1 1 6F379528
+P 5900 2900
+F 0 "R15" H 5750 2959 59  0000 L BNN
+F 1 "1k" H 5950 2970 59  0000 L BNN
+F 2 "Display:R0805" H 5900 2900 50  0001 C CNN
+F 3 "" H 5900 2900 50  0001 C CNN
+	1    5900 2900
 	1    0    0    -1  
 $EndComp
 Text Notes 6900 1600 0    59   ~ 0

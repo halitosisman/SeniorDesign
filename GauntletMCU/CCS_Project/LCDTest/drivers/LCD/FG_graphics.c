@@ -3,11 +3,17 @@
  *
  *  Created on: Feb 27, 2020
  *      Author: halitosisman
+ *
+ *
  */
 
 
 #include "drivers/LCD/FG_graphics.h"
 
+static volatile uint32_t * const wrx = (uint32_t *) (GPIOA0_BASE + LCD_WRX_MSK);
+static volatile uint32_t * const dcx = (uint32_t *) (GPIOA0_BASE + LCD_DCX_MSK);
+static volatile uint32_t * const data_30 = (uint32_t *) (GPIOA0_BASE + LCD_D30_MSK);
+static volatile uint32_t * const data_74 = (uint32_t *) (GPIOA1_BASE + LCD_D74_MSK);
 
 static Graphics_Rectangle wrist_display_limits =
 {
@@ -39,24 +45,193 @@ Graphics_Context wrist_context =
 };
 #endif
 
+
+inline void set_dcx(uint8_t val) {
+    *dcx = val;
+}
+
+
+/*
+    Note: I took a look at the generated assembly for this, and it looks like the nominal execution time for the loop
+    here is 262.5ns.
+*/
+void ILI_write_bulk(uint8_t * buf, uint16_t cnt) {
+
+    for(int i = 0; i < cnt; i++) {
+        *data_30 = buf[i];
+        *data_74 = buf[i];
+        *wrx = 0xFF;
+
+        __asm("    nop");
+        __asm("    nop");
+
+        *wrx = 0x0;
+    }
+}
+
+
+void ILI_write_color(uint8_t * color, uint8_t color_len, int num) {
+    for (int i = 0; i < num; i++) {
+        for (int j = 0; j < color_len; j++) {
+            *data_30 = color[j];
+            *data_74 = color[j];
+            *wrx = 0xFF;
+
+            __asm("    nop");
+            __asm("    nop");
+
+            *wrx = 0x0;
+        }
+    }
+}
+
+
+void write8(uint8_t val) {
+    *data_30 = val;
+    *data_74 = val;
+
+    *wrx = 0xFF;
+
+    __asm("    nop");
+    __asm("    nop");
+
+    *wrx = 0x0;
+}
+
+
 void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue) {
-    mem_write.tag = NO_CMD;
+    pg_set.data[0] = lY >> 8;
+    pg_set.data[1] = lY & 0xF;
+    pg_set.data[2] = (lY + 1) >> 8;
+    pg_set.data[3] = (lY + 1) & 0xF;
 
-    pg_set.data.small[0] = 0x0;
-    pg_set.data.small[1] = 0x0;
-    pg_set.data.small[2] = lX >> 8;
-    pg_set.data.small[3] = lX & 0xF;
+    cl_set.data[0] = lX >> 8;
+    cl_set.data[1] = lX & 0xF;
+    cl_set.data[2] = (lX + 1) >> 8;
+    cl_set.data[3] = (lX + 1) & 0xF;
 
-    cl_set.data.small[0] = 0x0;
-    cl_set.data.small[1] = 0x0;
-    cl_set.data.small[2] = 0x0;
-    cl_set.data.small[3] = 0xEF;
+    ILI_cfg(pg_set);
+    ILI_cfg(cl_set);
+
+    ILI_cfg(mem_write);
+    write8((uint8_t) (ulValue >> 8));
+    write8((uint8_t) (ulValue & 0xF));
+}
+
+
+void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, int16_t lX0, int16_t lCount,
+                          int16_t lBPP, const uint8_t * pucData, const uint32_t * pucPalette) {
+    int16_t x0 = lX0 / lBPP;
+    uint16_t display_color = 0;
+    uint32_t graphics_color = 0;
+    uint8_t palette_msk = 0;
+
+    pg_set.data[0] = lY >> 8;
+    pg_set.data[1] = lY & 0xF;
+    pg_set.data[2] = lY>> 8;
+    pg_set.data[3] = lY & 0xF;;
+
+    cl_set.data[0] = lX >> 8;
+    cl_set.data[1] = lX & 0xF;
+    cl_set.data[2] = (lX + lCount) >> 8;  // Note that the column raster is one larger than necessary here
+    cl_set.data[3] = (lX + lCount) & 0xF;
+
+    ILI_cfg(pg_set);
+    ILI_cfg(cl_set);
+
+    ILI_cfg(mem_write);
+
+    palette_msk = 0xF >> (8 - lBPP);
+
+    for(int16_t i = x0; i < lCount; i++) {
+        graphics_color = pucPalette[pucData[i] >> (i % (8 / lBPP)) & palette_msk];
+        display_color = pDisplay->pFxns->pfnColorTranslate(pDisplay, graphics_color);
+        write8(display_color >> 8);
+        write8(display_color & 8);
+    }
+}
+
+
+void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, int16_t lY, uint16_t ulValue) {
+    uint8_t buf[] = {ulValue >> 8, ulValue & 8};
+
+    pg_set.data[0] = lY >> 8;
+    pg_set.data[1] = lY & 0xF;
+    pg_set.data[2] = lY>> 8;
+    pg_set.data[3] = lY & 0xF;;
+
+    cl_set.data[0] = lX >> 8;
+    cl_set.data[1] = lX & 0xF;
+    cl_set.data[2] = lX2 >> 8;
+    cl_set.data[3] = lX2 & 0xF;
+
+    ILI_cfg(pg_set);
+    ILI_cfg(cl_set);
+
+    ILI_cfg(mem_write);
+
+    ILI_write_color(buf, sizeof(buf), lX2 - lX1 + 1);
+}
+
+
+void pfnLineDrawV(const Graphics_Display * pDisplay, int16_t lX, int16_t lY1, int16_t lY2, uint16_t ulValue) {
+    uint8_t buf[] = {ulValue >> 8, ulValue & 8};
+
+    pg_set.data[0] = lY >> 8;
+    pg_set.data[1] = lY & 0xF;
+    pg_set.data[2] = lY2 >> 8;
+    pg_set.data[3] = lY2 & 0xF;;
+
+    cl_set.data[0] = lX >> 8;
+    cl_set.data[1] = lX & 0xF;
+    cl_set.data[2] = lX >> 8;
+    cl_set.data[3] = lX & 0xF;
+
+    ILI_cfg(pg_set);
+    ILI_cfg(cl_set);
+
+    ILI_cfg(mem_write);
+
+    ILI_write_color(buf, sizeof(buf), lY2 - lY1 + 1);
+}
+
+
+void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectangle * pRect, uint16_t ulValue) {
+    uint8_t buf[] = {ulValue >> 8, ulValue & 8};
+    int size = 0;
+
+    pg_set.data[0] = pRect->yMin >> 8;
+    pg_set.data[1] = pRect->yMin & 0xF;
+    pg_set.data[2] = pRect->yMax >> 8;
+    pg_set.data[3] = pRect->yMax & 0xF;;
+
+    cl_set.data[0] = pRect->xMin >> 8;
+    cl_set.data[1] = pRect->xMin & 0xF;
+    cl_set.data[2] = pRect->yMax >> 8;
+    cl_set.data[3] = pRect->yMax & 0xF;
+
+    ILI_cfg(pg_set);
+    ILI_cfg(cl_set);
+
+    ILI_cfg(mem_write);
+
+    size = (pRect->yMax - pRect->yMin + 1) * (pRect->xMax - pRect->xMin + 1);
+
+    ILI_write_color(buf, sizeof(buf), size);
+}
+
+
+uint32_t pfnColorTranslate(const Graphics_Display * pDisplay, uint32_t ulValue) {
+    // TODO continue here
 }
 
 
 void FG_graphics_init() {
+
+    *wrx = 0x0;
+    *data_30 = 0x0;
+    *data_74 = 0x0;
     lcd_init();
     lcd_clear();
-
 
 }

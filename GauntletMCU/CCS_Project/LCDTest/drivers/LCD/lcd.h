@@ -21,10 +21,17 @@ extern "C" {
 #define LCD_COLUMNS 320
 #define LCD_ROWS 240
 
+#define LCD_MAX_COLUMN (LCD_COLUMNS - 1)
+#define LCD_MAX_ROW (LCD_ROWS - 1)
 
-extern LCD_CMD_t pg_set;
-extern LCD_CMD_t cl_set;
-extern LCD_CMD_t mem_write;
+#define NO_CMD 0
+#define ONE_BYTE_CMD 1
+#define TWO_BYTE_CMD 2
+#define FOUR_BYTE_CMD 4
+
+extern LCD_CFG pg_set;
+extern LCD_CFG cl_set;
+extern LCD_CFG mem_write;
 
 
 //void set_draw_window(int16_t lX, int16_t lY, );
