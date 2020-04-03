@@ -12,23 +12,47 @@
 LCD_CFG pg_set =
 {
      .cmd = ILI9341_PAGEADDRSET,
-     small = {0, 0, 0, 0},
+     .data = {0, 0, 0, 0},
      .tag = FOUR_BYTE_CMD
 };
 
 LCD_CFG cl_set =
 {
      .cmd = ILI9341_COLADDRSET,
-     .data.small = {0, 0, 0, 0},
+     .data = {0, 0, 0, 0},
      .tag = FOUR_BYTE_CMD
 };
 
 LCD_CFG mem_write =
 {
      .cmd = ILI9341_MEMORYWRITE,
-     .data.small = {0, 0, 0, 0},
+     .data = {0, 0, 0, 0},
      .tag = NO_CMD
 };
+
+
+void ILI_cfg(LCD_CFG setting)
+{
+    set_dcx(DCX_CMD);
+    write8(setting.cmd);
+    set_dcx(DCX_DATA);
+    switch (setting.tag) {
+    case TWO_BYTE_CMD:
+        write8(setting.data[0]);
+        write8(setting.data[1]);
+        break;
+    case ONE_BYTE_CMD:
+        write8(setting.data[0]);
+        break;
+    case FOUR_BYTE_CMD:
+        ILI_write_bulk((uint8_t *) setting.data, setting.tag);
+        break;
+    case NO_CMD:
+        break;
+    default:
+        // maybe add a bounds check here
+    }
+}
 
 
 void lcd_init() {
@@ -45,50 +69,50 @@ void lcd_init() {
     LCD_CFG disp_on;
 
     reset.cmd = ILI9341_SOFTRESET;
-    reset.data.small[0] = 0x0;
+    reset.data[0] = 0x0;
     reset.tag = ONE_BYTE_CMD;
 
     disp_off.cmd = ILI9341_DISPLAYOFF;
-    disp_off.data.small[0] = 0x0;
+    disp_off.data[0] = 0x0;
     disp_off.tag = ONE_BYTE_CMD;
 
     pow1.cmd = ILI9341_POWERCONTROL1;
-    pow1.data.small[0] = 0x23;
+    pow1.data[0] = 0x23;
     pow1.tag = ONE_BYTE_CMD;
 
     pow2.cmd = ILI9341_POWERCONTROL2;
-    pow2.data.small[0] = 0x10;
+    pow2.data[0] = 0x10;
     pow2.tag = ONE_BYTE_CMD;
 
     vcom1.cmd = ILI9341_VCOMCONTROL1;
-    vcom1.data.small[0] = 0x2B;
-    vcom1.data.small[1] = 0x2B;
+    vcom1.data[0] = 0x2B;
+    vcom1.data[1] = 0x2B;
     vcom1.tag = TWO_BYTE_CMD;
 
     vcom2.cmd = ILI9341_VCOMCONTROL2;
-    vcom2.data.small[0] = 0xC0;
+    vcom2.data[0] = 0xC0;
     vcom2.tag = ONE_BYTE_CMD;
 
     memctrl.cmd = ILI9341_MEMCONTROL;
-    memctrl.data.small[0] = ILI9341_MADCTL_MY | ILI9341_MADCTL_MX |
+    memctrl.data[0] = ILI9341_MADCTL_MY | ILI9341_MADCTL_MX |
             ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
     memctrl.tag = ONE_BYTE_CMD;
 
     pixformat.cmd = ILI9341_PIXELFORMAT;
-    pixformat.data.small[0] = 0x55;
+    pixformat.data[0] = 0x55;
     pixformat.tag = ONE_BYTE_CMD;
 
     frctrl.cmd = ILI9341_FRAMECONTROL;
-    frctrl.data.small[0] = 0x00;
-    frctrl.data.small[1] = 0x1B;
+    frctrl.data[0] = 0x00;
+    frctrl.data[1] = 0x1B;
     frctrl.tag = TWO_BYTE_CMD;
 
     slp_out.cmd = ILI9341_SLEEPOUT;
-    slp_out.data.small[0] = 0x0;
+    slp_out.data[0] = 0x0;
     slp_out.tag = ONE_BYTE_CMD;
 
     disp_on.cmd = ILI9341_DISPLAYON;
-    disp_on.data.small[0] = 0x0;
+    disp_on.data[0] = 0x0;
     disp_on.tag = ONE_BYTE_CMD;
 
     //mem_write.data.bulk = blah;

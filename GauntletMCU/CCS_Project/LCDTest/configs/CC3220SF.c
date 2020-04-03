@@ -125,6 +125,8 @@ void CC3220SF_LAUNCHXL_initGeneral(void)
 void Board_init(void)
 {
     CC3220SF_LAUNCHXL_initGeneral();
+    GPIO_init();
+    SPI_init();
 }
 
 /*

@@ -54,8 +54,6 @@ static void net_init() {
     struct sched_param  priParam;
     pthread_t spawn_thread = (pthread_t)NULL;
 
-    SPI_init();
-
     /* Start the SimpleLink Host */
     pthread_attr_init(&pAttrs_spawn);
     priParam.sched_priority = SPAWN_TASK_PRIORITY;

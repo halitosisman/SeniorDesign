@@ -63,25 +63,10 @@ extern "C" {
 #define DCX_CMD 0x0
 #define DCX_DATA 0xFF
 
-typedef uint8_t tag_t;
-
-
-/*!
- *  @brief      Template transaction with LCD
- *
- *  Note that small style transactions are MSB first and bulk transactions are LSB
- *
- */
-typedef struct _LCD_CFG {
-    /*  Determines the category of transaction.  */
-    tag_t tag;
-
-    /*  command code */
-    uint8_t cmd;
-
-    /* command parameters */
-    uint8_t data[4];
-} LCD_CFG;
+#define NO_CMD 0
+#define ONE_BYTE_CMD 1
+#define TWO_BYTE_CMD 2
+#define FOUR_BYTE_CMD 4
 
 
 /*!
@@ -116,21 +101,6 @@ void ILI_write_color(uint8_t * color, uint8_t color_len, int num);
 
 */
 inline void set_dcx(uint8_t val);
-
-
-/*!
-    \brief          ILI_cfg
-
-    More efficient routine for writing command - parameter sequences
-
-    \param          LCD_CMD_t   -   The bytes to be written in order of low index to high
-
-    \return         void
-
-    \note
-
-*/
-void ILI_cfg(LCD_CFG setting);
 
 
 #ifdef _cplusplus

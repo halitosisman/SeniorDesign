@@ -10,42 +10,58 @@
 
 #include "drivers/LCD/FG_graphics.h"
 
+
 static volatile uint32_t * const wrx = (uint32_t *) (GPIOA0_BASE + LCD_WRX_MSK);
 static volatile uint32_t * const dcx = (uint32_t *) (GPIOA0_BASE + LCD_DCX_MSK);
 static volatile uint32_t * const data_30 = (uint32_t *) (GPIOA0_BASE + LCD_D30_MSK);
 static volatile uint32_t * const data_74 = (uint32_t *) (GPIOA1_BASE + LCD_D74_MSK);
 
-static Graphics_Rectangle wrist_display_limits =
+
+static void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue);
+static void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, int16_t lX0, int16_t lCount,
+                          int16_t lBPP, const uint8_t * pucData, const uint32_t * pucPalette);
+static void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, int16_t lY, uint16_t ulValue);
+static void pfnLineDrawV(const Graphics_Display * pDisplay, int16_t lX, int16_t lY1, int16_t lY2, uint16_t ulValue);
+static void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectangle * pRect, uint16_t ulValue);
+static uint32_t pfnColorTranslate(const Graphics_Display * pDisplay, uint32_t ulValue);
+static void pfnFlush(const Graphics_Display * pDisplay);
+static void pfnClearDisplay(const Graphics_Display * pDisplay, uint16_t ulValue);
+
+
+static Graphics_Display_Functions FGG_Functions =
 {
-     .xMax = LCD_COLUMNS - 1,
-     .xMin = 0,
-     .yMax = LCD_ROWS - 1,
-     .yMin = 0
+     .pfnPixelDraw = pfnPixelDraw,
+     .pfnPixelDrawMultiple = pfnPixelDrawMultiple,
+     .pfnLineDrawH = pfnLineDrawH,
+     .pfnLineDrawV = pfnLineDrawV,
+     .pfnRectFill = pfnRectFill,
+     .pfnColorTranslate = pfnColorTranslate,
+     .pfnFlush = pfnFlush,
+     .pfnClearDisplay = pfnClearDisplay
 };
 
 static Graphics_Display wrist_display =
 {
      .displayData = NULL,
      .heigth = LCD_ROWS,
-     .pFxns = NULL, // TODO Define these.
+     .pFxns = &FGG_Functions,
      .size = sizeof(Graphics_Display),
      .width = LCD_COLUMNS
 };
 
-#if 0
-#define
-Graphics_Context wrist_context =
+Graphics_Context FGG_Context =
 {
      .background = 0,
-     .clipRegion = wr_display_limits,
-     .font = g_sFontCm12,
+     .clipRegion.xMin = 0,
+     .clipRegion.yMin = 0,
+     .clipRegion.xMax = wrist_display.width - 1,
+     .clipRegion.yMax = wrist_display.heigth - 1,
+     .display = wrist_display,
+     .font = &g_sFontCm12,
      .foreground = 0,
      .size = sizeof(Graphics_Context),
-     .display = wrist_display
+     .background = 0
 };
-#endif
-
-
 inline void set_dcx(uint8_t val) {
     *dcx = val;
 }
@@ -99,7 +115,7 @@ void write8(uint8_t val) {
 }
 
 
-void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue) {
+static void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue) {
     pg_set.data[0] = lY >> 8;
     pg_set.data[1] = lY & 0xF;
     pg_set.data[2] = (lY + 1) >> 8;
@@ -119,7 +135,7 @@ void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uin
 }
 
 
-void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, int16_t lX0, int16_t lCount,
+static void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, int16_t lX0, int16_t lCount,
                           int16_t lBPP, const uint8_t * pucData, const uint32_t * pucPalette) {
     int16_t x0 = lX0 / lBPP;
     uint16_t display_color = 0;
@@ -152,7 +168,7 @@ void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, int16_t
 }
 
 
-void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, int16_t lY, uint16_t ulValue) {
+static void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, int16_t lY, uint16_t ulValue) {
     uint8_t buf[] = {ulValue >> 8, ulValue & 8};
 
     pg_set.data[0] = lY >> 8;
@@ -160,8 +176,8 @@ void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, i
     pg_set.data[2] = lY>> 8;
     pg_set.data[3] = lY & 0xF;;
 
-    cl_set.data[0] = lX >> 8;
-    cl_set.data[1] = lX & 0xF;
+    cl_set.data[0] = lX1 >> 8;
+    cl_set.data[1] = lX1 & 0xF;
     cl_set.data[2] = lX2 >> 8;
     cl_set.data[3] = lX2 & 0xF;
 
@@ -174,11 +190,11 @@ void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, i
 }
 
 
-void pfnLineDrawV(const Graphics_Display * pDisplay, int16_t lX, int16_t lY1, int16_t lY2, uint16_t ulValue) {
+static void pfnLineDrawV(const Graphics_Display * pDisplay, int16_t lX, int16_t lY1, int16_t lY2, uint16_t ulValue) {
     uint8_t buf[] = {ulValue >> 8, ulValue & 8};
 
-    pg_set.data[0] = lY >> 8;
-    pg_set.data[1] = lY & 0xF;
+    pg_set.data[0] = lY1 >> 8;
+    pg_set.data[1] = lY1 & 0xF;
     pg_set.data[2] = lY2 >> 8;
     pg_set.data[3] = lY2 & 0xF;;
 
@@ -196,7 +212,7 @@ void pfnLineDrawV(const Graphics_Display * pDisplay, int16_t lX, int16_t lY1, in
 }
 
 
-void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectangle * pRect, uint16_t ulValue) {
+static void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectangle * pRect, uint16_t ulValue) {
     uint8_t buf[] = {ulValue >> 8, ulValue & 8};
     int size = 0;
 
@@ -221,17 +237,46 @@ void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectangle * p
 }
 
 
-uint32_t pfnColorTranslate(const Graphics_Display * pDisplay, uint32_t ulValue) {
-    // TODO continue here
+// Translates ulValue to 5-6-5 format by discarding less significant bits
+static uint32_t pfnColorTranslate(const Graphics_Display * pDisplay, uint32_t ulValue) {
+    uint16_t retVal = 0;
+    retVal |= ulValue >> 19 | ulValue & GRAPHICS_COLOR_LIME >> 10 | ulValue & GRAPHICS_COLOR_BLUE >> 3;
+    return retVal;
+}
+
+
+static void pfnFlush(const Graphics_Display * pDisplay) {
+
+}
+
+
+static void pfnClearDisplay(const Graphics_Display * pDisplay, uint16_t ulValue) {
+    uint8_t color[] = {0x0, 0x0};
+
+    pg_set.data[0] = 0x0;
+    pg_set.data[1] = 0x0;
+    pg_set.data[2] = 0x0;
+    pg_set.data[3] = 0xEF;
+
+    cl_set.data[0] = 0x0;
+    cl_set.data[1] = 0x0;
+    cl_set.data[2] = 0x1;
+    cl_set.data[3] = 0x3F;
+
+    ILI_cfg(pg_set);
+    ILI_cfg(cl_set);
+
+    ILI_cfg(mem_write);
+    ILI_write_color((uint8_t *) color, sizeof(color), pDisplay->width * pDisplay->heigth);
 }
 
 
 void FG_graphics_init() {
 
+    *dcx = DCX_CMD;
     *wrx = 0x0;
     *data_30 = 0x0;
     *data_74 = 0x0;
     lcd_init();
-    lcd_clear();
-
+    Graphics_clearDisplay(&FGG_Context);
 }
