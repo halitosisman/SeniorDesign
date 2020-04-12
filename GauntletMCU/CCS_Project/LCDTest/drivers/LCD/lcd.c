@@ -94,8 +94,7 @@ void lcd_init() {
     vcom2.tag = ONE_BYTE_CMD;
 
     memctrl.cmd = ILI9341_MEMCONTROL;
-    memctrl.data[0] = ILI9341_MADCTL_MY | ILI9341_MADCTL_MX |
-            ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+    memctrl.data[0] = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
     memctrl.tag = ONE_BYTE_CMD;
 
     pixformat.cmd = ILI9341_PIXELFORMAT;

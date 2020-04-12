@@ -13,8 +13,8 @@
 
 static volatile uint32_t * const wrx = (uint32_t *) (GPIOA0_BASE + LCD_WRX_MSK);
 static volatile uint32_t * const dcx = (uint32_t *) (GPIOA0_BASE + LCD_DCX_MSK);
-static volatile uint32_t * const data_30 = (uint32_t *) (GPIOA0_BASE + LCD_D30_MSK);
-static volatile uint32_t * const data_74 = (uint32_t *) (GPIOA1_BASE + LCD_D74_MSK);
+static volatile uint32_t * const data_30 = (uint32_t *) (GPIOA1_BASE + LCD_D30_MSK);
+static volatile uint32_t * const data_74 = (uint32_t *) (GPIOA0_BASE + LCD_D74_MSK);
 
 
 static void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue);
@@ -54,9 +54,9 @@ Graphics_Context FGG_Context =
      .background = 0,
      .clipRegion.xMin = 0,
      .clipRegion.yMin = 0,
-     .clipRegion.xMax = wrist_display.width - 1,
-     .clipRegion.yMax = wrist_display.heigth - 1,
-     .display = wrist_display,
+     .clipRegion.xMax = LCD_COLUMNS - 1,
+     .clipRegion.yMax = LCD_ROWS - 1,
+     .display = &wrist_display,
      .font = &g_sFontCm12,
      .foreground = 0,
      .size = sizeof(Graphics_Context),
@@ -255,13 +255,13 @@ static void pfnClearDisplay(const Graphics_Display * pDisplay, uint16_t ulValue)
 
     pg_set.data[0] = 0x0;
     pg_set.data[1] = 0x0;
-    pg_set.data[2] = 0x0;
-    pg_set.data[3] = 0xEF;
+    pg_set.data[2] = 0x1;
+    pg_set.data[3] = 0x3F;
 
     cl_set.data[0] = 0x0;
     cl_set.data[1] = 0x0;
-    cl_set.data[2] = 0x1;
-    cl_set.data[3] = 0x3F;
+    cl_set.data[2] = 0x0;
+    cl_set.data[3] = 0xEF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
@@ -279,4 +279,6 @@ void FG_graphics_init() {
     *data_74 = 0x0;
     lcd_init();
     Graphics_clearDisplay(&FGG_Context);
+    Graphics_setForegroundColor(&FGG_Context, 0xFF);
+    //Graphics_drawCircle(&FGG_Context, 100, 50, 10);
 }
