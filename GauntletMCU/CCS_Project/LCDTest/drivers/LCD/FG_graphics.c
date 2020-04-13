@@ -49,7 +49,7 @@ static Graphics_Display wrist_display =
      .width = LCD_COLUMNS
 };
 
-Graphics_Context FGG_Context =
+Graphics_Context g_sContext =
 {
      .background = 0,
      .clipRegion.xMin = 0,
@@ -62,6 +62,7 @@ Graphics_Context FGG_Context =
      .size = sizeof(Graphics_Context),
      .background = 0
 };
+
 inline void set_dcx(uint8_t val) {
     *dcx = val;
 }
@@ -117,21 +118,21 @@ void write8(uint8_t val) {
 
 static void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue) {
     pg_set.data[0] = lY >> 8;
-    pg_set.data[1] = lY & 0xF;
+    pg_set.data[1] = lY & 0xFF;
     pg_set.data[2] = (lY + 1) >> 8;
-    pg_set.data[3] = (lY + 1) & 0xF;
+    pg_set.data[3] = (lY + 1) & 0xFF;
 
     cl_set.data[0] = lX >> 8;
-    cl_set.data[1] = lX & 0xF;
+    cl_set.data[1] = lX & 0xFF;
     cl_set.data[2] = (lX + 1) >> 8;
-    cl_set.data[3] = (lX + 1) & 0xF;
+    cl_set.data[3] = (lX + 1) & 0xFF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
 
     ILI_cfg(mem_write);
     write8((uint8_t) (ulValue >> 8));
-    write8((uint8_t) (ulValue & 0xF));
+    write8((uint8_t) (ulValue & 0xFF));
 }
 
 
@@ -143,14 +144,14 @@ static void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, 
     uint8_t palette_msk = 0;
 
     pg_set.data[0] = lY >> 8;
-    pg_set.data[1] = lY & 0xF;
+    pg_set.data[1] = lY & 0xFF;
     pg_set.data[2] = lY>> 8;
-    pg_set.data[3] = lY & 0xF;;
+    pg_set.data[3] = lY & 0xFF;;
 
     cl_set.data[0] = lX >> 8;
-    cl_set.data[1] = lX & 0xF;
+    cl_set.data[1] = lX & 0xFF;
     cl_set.data[2] = (lX + lCount) >> 8;  // Note that the column raster is one larger than necessary here
-    cl_set.data[3] = (lX + lCount) & 0xF;
+    cl_set.data[3] = (lX + lCount) & 0xFF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
@@ -163,23 +164,23 @@ static void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, 
         graphics_color = pucPalette[pucData[i] >> (i % (8 / lBPP)) & palette_msk];
         display_color = pDisplay->pFxns->pfnColorTranslate(pDisplay, graphics_color);
         write8(display_color >> 8);
-        write8(display_color & 8);
+        write8(display_color & 0xFF);
     }
 }
 
 
 static void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t lX2, int16_t lY, uint16_t ulValue) {
-    uint8_t buf[] = {ulValue >> 8, ulValue & 8};
+    uint8_t buf[] = {ulValue >> 8, ulValue & 0xFF};
 
     pg_set.data[0] = lY >> 8;
-    pg_set.data[1] = lY & 0xF;
+    pg_set.data[1] = lY & 0xFF;
     pg_set.data[2] = lY>> 8;
-    pg_set.data[3] = lY & 0xF;;
+    pg_set.data[3] = lY & 0xFF;;
 
     cl_set.data[0] = lX1 >> 8;
-    cl_set.data[1] = lX1 & 0xF;
+    cl_set.data[1] = lX1 & 0xFF;
     cl_set.data[2] = lX2 >> 8;
-    cl_set.data[3] = lX2 & 0xF;
+    cl_set.data[3] = lX2 & 0xFF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
@@ -191,17 +192,17 @@ static void pfnLineDrawH(const Graphics_Display * pDisplay, int16_t lX1, int16_t
 
 
 static void pfnLineDrawV(const Graphics_Display * pDisplay, int16_t lX, int16_t lY1, int16_t lY2, uint16_t ulValue) {
-    uint8_t buf[] = {ulValue >> 8, ulValue & 8};
+    uint8_t buf[] = {ulValue >> 8, ulValue & 0xFF};
 
     pg_set.data[0] = lY1 >> 8;
-    pg_set.data[1] = lY1 & 0xF;
+    pg_set.data[1] = lY1 & 0xFF;
     pg_set.data[2] = lY2 >> 8;
-    pg_set.data[3] = lY2 & 0xF;;
+    pg_set.data[3] = lY2 & 0xFF;;
 
     cl_set.data[0] = lX >> 8;
-    cl_set.data[1] = lX & 0xF;
+    cl_set.data[1] = lX & 0xFF;
     cl_set.data[2] = lX >> 8;
-    cl_set.data[3] = lX & 0xF;
+    cl_set.data[3] = lX & 0xFF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
@@ -217,14 +218,14 @@ static void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectan
     int size = 0;
 
     pg_set.data[0] = pRect->yMin >> 8;
-    pg_set.data[1] = pRect->yMin & 0xF;
+    pg_set.data[1] = pRect->yMin & 0xFF;
     pg_set.data[2] = pRect->yMax >> 8;
-    pg_set.data[3] = pRect->yMax & 0xF;;
+    pg_set.data[3] = pRect->yMax & 0xFF;;
 
     cl_set.data[0] = pRect->xMin >> 8;
-    cl_set.data[1] = pRect->xMin & 0xF;
+    cl_set.data[1] = pRect->xMin & 0xFF;
     cl_set.data[2] = pRect->yMax >> 8;
-    cl_set.data[3] = pRect->yMax & 0xF;
+    cl_set.data[3] = pRect->yMax & 0xFF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
@@ -240,7 +241,7 @@ static void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectan
 // Translates ulValue to 5-6-5 format by discarding less significant bits
 static uint32_t pfnColorTranslate(const Graphics_Display * pDisplay, uint32_t ulValue) {
     uint16_t retVal = 0;
-    retVal |= ulValue >> 19 | ulValue & GRAPHICS_COLOR_LIME >> 10 | ulValue & GRAPHICS_COLOR_BLUE >> 3;
+    retVal = ((ulValue & FGG_RED_MSK) >> 8) | ((ulValue & FGG_GREEN_MSK) >> 5) | ((ulValue & FGG_BLUE_MSK) >> 3);
     return retVal;
 }
 
@@ -255,13 +256,13 @@ static void pfnClearDisplay(const Graphics_Display * pDisplay, uint16_t ulValue)
 
     pg_set.data[0] = 0x0;
     pg_set.data[1] = 0x0;
-    pg_set.data[2] = 0x1;
-    pg_set.data[3] = 0x3F;
+    pg_set.data[2] = 0x0;
+    pg_set.data[3] = 0xEF;
 
     cl_set.data[0] = 0x0;
     cl_set.data[1] = 0x0;
-    cl_set.data[2] = 0x0;
-    cl_set.data[3] = 0xEF;
+    cl_set.data[2] = 0x1;
+    cl_set.data[3] = 0x3F;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);
@@ -270,15 +271,41 @@ static void pfnClearDisplay(const Graphics_Display * pDisplay, uint16_t ulValue)
     ILI_write_color((uint8_t *) color, sizeof(color), pDisplay->width * pDisplay->heigth);
 }
 
-
 void FG_graphics_init() {
-
     *dcx = DCX_CMD;
     *wrx = 0x0;
     *data_30 = 0x0;
     *data_74 = 0x0;
     lcd_init();
-    Graphics_clearDisplay(&FGG_Context);
-    Graphics_setForegroundColor(&FGG_Context, 0xFF);
+    Graphics_clearDisplay(&g_sContext);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
+    Graphics_drawPixel(&g_sContext, 10, 5);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_RED);
+    Graphics_drawLineH(&g_sContext, 10, 300, 10);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_LIME);
+    Graphics_drawLineV(&g_sContext, 315, 10, 220);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_PURPLE);
+    Graphics_fillCircle(&g_sContext, 100, 100, 15);
+
+    int8_t hi[] = "Hello, World!";
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_AQUAMARINE);
+    Graphics_drawString(&g_sContext, hi, sizeof(hi) - 1, 10, 200, 1);
+
+    int8_t checkText[] = "Checkbox!";
+
+    Graphics_CheckBox testBox =
+    {
+         .backgroundColor = GRAPHICS_COLOR_DEEP_SKY_BLUE,
+         .font = &g_sFontCm12,
+         .gap = 5,
+         .numbOfChar = sizeof(checkText) - 1,
+         .selected = 0,
+         .selectedColor = GRAPHICS_COLOR_DARK_VIOLET,
+         .text = checkText,
+         .textColor = GRAPHICS_COLOR_INDIAN_RED,
+         .xPosition = 200,
+         .yPosition = 200
+    };
+    Graphics_drawCheckBox(&g_sContext, &testBox);
     //Graphics_drawCircle(&FGG_Context, 100, 50, 10);
 }

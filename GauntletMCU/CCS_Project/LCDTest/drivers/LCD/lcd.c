@@ -31,6 +31,84 @@ LCD_CFG mem_write =
 };
 
 
+static LCD_CFG reset =
+{
+     .cmd = ILI9341_SOFTRESET,
+     .data[0] = 0x0,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG disp_off =
+{
+     .cmd = ILI9341_DISPLAYOFF,
+     .data[0] = 0x0,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG pow1 =
+{
+     .cmd = ILI9341_POWERCONTROL1,
+     .data[0] = 0x23,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG pow2 =
+{
+     .cmd = ILI9341_POWERCONTROL2,
+     .data[0] = 0x10,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG vcom1 =
+{
+     .cmd = ILI9341_VCOMCONTROL1,
+     .data = {0x2B, 0x2B, 0x0, 0x0},
+     .tag = TWO_BYTE_CMD
+};
+
+static LCD_CFG vcom2 =
+{
+     .cmd = ILI9341_VCOMCONTROL2,
+     .data[0] = 0xC0,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG memctrl =
+{
+     .cmd = ILI9341_MEMCONTROL,
+     .data[0] = ILI9341_MADCTL_BGR | ILI9341_MADCTL_MV,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG pixformat =
+{
+     .cmd = ILI9341_PIXELFORMAT,
+     .data[0] = 0x55,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG frctrl =
+{
+     .cmd = ILI9341_FRAMECONTROL,
+     .data = {0x00, 0x1B, 0x0, 0x0},
+     .tag = TWO_BYTE_CMD
+};
+
+static LCD_CFG slp_out =
+{
+     .cmd = ILI9341_SLEEPOUT,
+     .data[0] = 0x0,
+     .tag = ONE_BYTE_CMD
+};
+
+static LCD_CFG disp_on =
+{
+     .cmd = ILI9341_DISPLAYON,
+     .data[0] = 0x0,
+     .tag = ONE_BYTE_CMD
+};
+
+
 void ILI_cfg(LCD_CFG setting)
 {
     set_dcx(DCX_CMD);
@@ -56,66 +134,6 @@ void ILI_cfg(LCD_CFG setting)
 
 
 void lcd_init() {
-    LCD_CFG reset;
-    LCD_CFG disp_off;
-    LCD_CFG pow1;
-    LCD_CFG pow2;
-    LCD_CFG vcom1;
-    LCD_CFG vcom2;
-    LCD_CFG memctrl;
-    LCD_CFG pixformat;
-    LCD_CFG frctrl;
-    LCD_CFG slp_out;
-    LCD_CFG disp_on;
-
-    reset.cmd = ILI9341_SOFTRESET;
-    reset.data[0] = 0x0;
-    reset.tag = ONE_BYTE_CMD;
-
-    disp_off.cmd = ILI9341_DISPLAYOFF;
-    disp_off.data[0] = 0x0;
-    disp_off.tag = ONE_BYTE_CMD;
-
-    pow1.cmd = ILI9341_POWERCONTROL1;
-    pow1.data[0] = 0x23;
-    pow1.tag = ONE_BYTE_CMD;
-
-    pow2.cmd = ILI9341_POWERCONTROL2;
-    pow2.data[0] = 0x10;
-    pow2.tag = ONE_BYTE_CMD;
-
-    vcom1.cmd = ILI9341_VCOMCONTROL1;
-    vcom1.data[0] = 0x2B;
-    vcom1.data[1] = 0x2B;
-    vcom1.tag = TWO_BYTE_CMD;
-
-    vcom2.cmd = ILI9341_VCOMCONTROL2;
-    vcom2.data[0] = 0xC0;
-    vcom2.tag = ONE_BYTE_CMD;
-
-    memctrl.cmd = ILI9341_MEMCONTROL;
-    memctrl.data[0] = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
-    memctrl.tag = ONE_BYTE_CMD;
-
-    pixformat.cmd = ILI9341_PIXELFORMAT;
-    pixformat.data[0] = 0x55;
-    pixformat.tag = ONE_BYTE_CMD;
-
-    frctrl.cmd = ILI9341_FRAMECONTROL;
-    frctrl.data[0] = 0x00;
-    frctrl.data[1] = 0x1B;
-    frctrl.tag = TWO_BYTE_CMD;
-
-    slp_out.cmd = ILI9341_SLEEPOUT;
-    slp_out.data[0] = 0x0;
-    slp_out.tag = ONE_BYTE_CMD;
-
-    disp_on.cmd = ILI9341_DISPLAYON;
-    disp_on.data[0] = 0x0;
-    disp_on.tag = ONE_BYTE_CMD;
-
-    //mem_write.data.bulk = blah;
-    // mem_write.tag = sizeof(blah);
 
     ILI_cfg(reset);
     vTaskDelay(pdMS_TO_TICKS(5));
@@ -130,8 +148,6 @@ void lcd_init() {
     ILI_cfg(slp_out);
     ILI_cfg(disp_on);
     vTaskDelay(pdMS_TO_TICKS(500));
-
-    //ILI_write(mem_write);
 }
 
 
