@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name Display-eagle-import)(type Legacy)(uri ${KIPRJMOD}/Display-eagle-import.lib)(options "")(descr ""))
+)
