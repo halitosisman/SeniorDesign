@@ -278,34 +278,43 @@ void FG_graphics_init() {
     *data_74 = 0x0;
     lcd_init();
     Graphics_clearDisplay(&g_sContext);
+}
+
+void FG_graphics_test() {
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
     Graphics_drawPixel(&g_sContext, 10, 5);
+    vTaskDelay(pdMS_TO_TICKS(1000));
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_RED);
     Graphics_drawLineH(&g_sContext, 10, 300, 10);
+    vTaskDelay(pdMS_TO_TICKS(1000));
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_LIME);
     Graphics_drawLineV(&g_sContext, 315, 10, 220);
+    vTaskDelay(pdMS_TO_TICKS(1000));
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_PURPLE);
     Graphics_fillCircle(&g_sContext, 100, 100, 15);
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
     int8_t hi[] = "Hello, World!";
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_AQUAMARINE);
     Graphics_drawString(&g_sContext, hi, sizeof(hi) - 1, 10, 200, 1);
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
     int8_t checkText[] = "Checkbox!";
 
     Graphics_CheckBox testBox =
     {
-         .backgroundColor = GRAPHICS_COLOR_DEEP_SKY_BLUE,
-         .font = &g_sFontCm12,
-         .gap = 5,
-         .numbOfChar = sizeof(checkText) - 1,
-         .selected = 0,
-         .selectedColor = GRAPHICS_COLOR_DARK_VIOLET,
-         .text = checkText,
-         .textColor = GRAPHICS_COLOR_INDIAN_RED,
-         .xPosition = 200,
-         .yPosition = 200
+     .backgroundColor = GRAPHICS_COLOR_DEEP_SKY_BLUE,
+     .font = &g_sFontCm12,
+     .gap = 5,
+     .numbOfChar = sizeof(checkText) - 1,
+     .selected = 0,
+     .selectedColor = GRAPHICS_COLOR_DARK_VIOLET,
+     .text = checkText,
+     .textColor = GRAPHICS_COLOR_INDIAN_RED,
+     .xPosition = 200,
+     .yPosition = 200
     };
     Graphics_drawCheckBox(&g_sContext, &testBox);
-    //Graphics_drawCircle(&FGG_Context, 100, 50, 10);
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    Graphics_clearDisplay(&g_sContext);
 }

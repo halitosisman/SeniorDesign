@@ -35,10 +35,15 @@
  */
 
 /* RTOS header files */
+#include <tasks/gui_task/gui_task.h>
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "Board.h"
+#include "tasks/FGTask.h"
+
+#include "configs/Board.h"
+#include "configs/thread_config.h"
+
 
 
 /*
@@ -46,11 +51,26 @@
  */
 int main(void)
 {
+    FGthread_arg_t thread_args;
+    T_Params net_arg;
 
     /* Call driver init functions */
     Board_init();
 
+    // Initialize the thread communication data structures
+    for(int i = 0; i <= sizeof(thread_args.mailroom); i++) {
+        thread_args.mailroom[i] = xQueueCreate(MAILBOX_SIZE, sizeof(Letter_t));
+    }
 
+    // Network Thread Initialization
+    net_arg.pcName = "lcd";
+    net_arg.pvParameters = &thread_args;
+    net_arg.pvTaskCode = gui_task;
+    net_arg.pxCreatedTask = NULL;
+    net_arg.usStackDepth = NET_TASK_STACK_SIZE;
+    net_arg.uxPriority = NET_TASK_PRIORITY;
+
+    FGcreate_task(net_arg);
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();

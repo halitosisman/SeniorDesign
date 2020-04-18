@@ -46,7 +46,7 @@ int32_t fatfs_getFatTime(void);
     \note
 
 */
-void lcd_task(void * par);
+void gui_task(void * par);
 
 
 #ifdef _cplusplus

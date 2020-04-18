@@ -39,7 +39,7 @@ extern const Graphics_Font g_sFontCm12;
 extern Graphics_Context g_sContext;
 
 void FG_graphics_init();
-
+void FG_graphics_test();
 
 #ifdef _cplusplus
 #define

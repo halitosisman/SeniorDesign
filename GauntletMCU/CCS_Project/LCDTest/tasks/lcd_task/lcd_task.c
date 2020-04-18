@@ -21,9 +21,9 @@ int32_t fatfs_getFatTime(void) {
 }
 
 
-void lcd_task(void * par) {
+void gui_task(void * par) {
     FG_graphics_init();
-
+    FG_graphics_test();
     while (1) {
     }
 
