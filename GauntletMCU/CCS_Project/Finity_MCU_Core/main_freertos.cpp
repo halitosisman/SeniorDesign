@@ -79,6 +79,11 @@ int main(void)
     return (0);
 }
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 //! \brief Application defined malloc failed hook
@@ -112,3 +117,7 @@ void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
     {
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
