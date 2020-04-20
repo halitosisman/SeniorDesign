@@ -130,7 +130,38 @@ void Board_init(void)
     CC3220SF_LAUNCHXL_initGeneral();
     GPIO_init();
     SPI_init();
+    I2C_init();
 }
+
+
+/*
+ *  =============================== I2C ===============================
+ */
+#include <ti/drivers/I2C.h>
+#include <ti/drivers/i2c/I2CCC32XX.h>
+
+I2CCC32XX_Object i2cCC3220SObjects[1];
+
+const I2CCC32XX_HWAttrsV1 i2cCC3220SHWAttrs[1] = {
+    {
+        .baseAddr = I2CA0_BASE,
+        .intNum = INT_I2CA0,
+        .intPriority = (~0),
+        .clkPin = I2CCC32XX_PIN_03_I2C_SCL,
+        .dataPin = I2CCC32XX_PIN_04_I2C_SDA
+    }
+};
+
+const I2C_Config I2C_config[1] = {
+    {
+        .fxnTablePtr = &I2CCC32XX_fxnTable,
+        .object = &i2cCC3220SObjects[0],
+        .hwAttrs = &i2cCC3220SHWAttrs[0]
+    }
+};
+
+const uint_least8_t I2C_count = 1;
+
 
 /*
  *  =============================== Power ===============================
