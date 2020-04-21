@@ -36,6 +36,7 @@
 
 /* RTOS header files */
 #include <tasks/gui_task/gui_task.h>
+#include <tasks/i2c_task/i2c_task.h>
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -65,7 +66,7 @@ int main(void)
     // Network Thread Initialization
     net_arg.pcName = "lcd";
     net_arg.pvParameters = &thread_args;
-    net_arg.pvTaskCode = gui_task;
+    net_arg.pvTaskCode = i2c_task;
     net_arg.pxCreatedTask = NULL;
     net_arg.usStackDepth = NET_TASK_STACK_SIZE;
     net_arg.uxPriority = NET_TASK_PRIORITY;

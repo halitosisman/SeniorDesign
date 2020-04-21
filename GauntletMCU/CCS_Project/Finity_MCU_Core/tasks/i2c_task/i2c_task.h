@@ -19,10 +19,6 @@ extern "C" {
 
 extern QueueHandle_t i2c_event_box; // because there's no other way for sl_events to signal net_task
 
-void AD7993_i2c_callback(I2C_Handle handle, I2C_Transaction *transaction, bool transferStatus) {
-
-}
-
 
 /*!
     \brief          net_task
@@ -37,7 +33,7 @@ void AD7993_i2c_callback(I2C_Handle handle, I2C_Transaction *transaction, bool t
                     thread safe.
 
 */
-extern void i2c_task(void * par);
+void i2c_task(void * par);
 
 #ifdef __cplusplus
 }
