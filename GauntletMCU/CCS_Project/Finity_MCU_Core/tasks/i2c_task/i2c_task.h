@@ -9,8 +9,15 @@
 #define TASKS_I2C_TASK_I2C_TASK_H_
 
 
+#define I2C_MAX_BLOCK_TIME_MS 500
+
+
 #include "tasks/FGtask.h"
 #include "drivers/ADC/ADC7993.h"
+#include "stdio.h"
+
+#include "drivers/LCD/FG_graphics.h"
+#include "GUI/FG_GUI.h" // TODO REMOVE ONCE SMAT IS DONE
 
 
 #ifdef __cplusplus

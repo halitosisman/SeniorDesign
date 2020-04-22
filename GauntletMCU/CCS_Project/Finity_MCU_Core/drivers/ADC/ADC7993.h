@@ -8,7 +8,7 @@
 #ifndef DRIVERS_ADC_ADC7993_H_
 #define DRIVERS_ADC_ADC7993_H_
 
-#include <ti/drivers/I2C.h>
+#include "drivers/I2C/AsyncI2C.h"
 
 
 #define ADC7993_1_ADR 0b0100011
@@ -49,7 +49,7 @@
                                         AD7993_CONF_BUSY_ALERT_ACTIVE_LOW_MSK)
 #define FINITY_GAUNTLET_AD7993_HYSTERESIS 8 // units of LSB
 #define FINITY_GAUNTLET_AD7993_DATA_HIGH 0xE8A // about 3V
-#define FINITY_GAUNTLET_AD7993_DATA_LOW 0x174 // about 0.3V
+#define FINITY_GAUNTLET_AD7993_DATA_LOW 0x0 // about 0.3V
 #define FINITY_GAUNTLET_AD7993_I2C_TIMEOUT_TICKS 10000000
 
 
@@ -59,9 +59,6 @@ extern "C" {
 
 
 typedef struct _AD7993_Config {
-    I2C_Params * i2c_params;
-    uint32_t i2c_timeout_ms;
-
     uint8_t config;
     uint16_t data_high[ADC7993_CH_CNT];
     uint16_t data_low[ADC7993_CH_CNT];
@@ -72,8 +69,8 @@ typedef struct _AD7993_Config {
 
 extern void AD7993_i2c_callback(I2C_Handle handle, I2C_Transaction *transaction, bool transferStatus);
 
-I2C_Handle AD7993_init(AD7993_Config AD7993_Handle);
-void AD7993_read_nonblocking(I2C_Handle device, AD7993_Config AD7993_Handle);
+Async_I2C_Handle * AD7993_init(AD7993_Config * AD7993_config);
+I2C_Transaction * AD7993_read_blocking(Async_I2C_Handle * AD7993_Handle);
 
 #ifdef __cplusplus
 }
