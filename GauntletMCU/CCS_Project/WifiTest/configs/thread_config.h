@@ -16,7 +16,7 @@
 #define LETTER_PAYLOAD_MAX_SIZE 4  // bytes
 
 #define NET_THREAD_ID 0
-#define DISPLAY_THREAD_ID 1
+#define GUI_THREAD_ID 1
 #define I2C_THREAD_ID 2
 
 #define NET_TASK_PRIORITY 5

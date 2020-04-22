@@ -20,6 +20,7 @@ public:
     virtual void init();
 private:
     Cord2D locs[3];
+    Cord2D s_size;
 };
 
 #endif /* GUI_STATETRACKER_H_ */

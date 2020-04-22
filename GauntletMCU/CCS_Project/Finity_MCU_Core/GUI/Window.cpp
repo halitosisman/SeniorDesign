@@ -40,3 +40,16 @@ Cord2D Window::getloc()
 {
     return this->loc;
 }
+
+void Window::clr_region(Graphics_Rectangle region)
+{
+    Graphics_Rectangle clr_region =
+    {
+     .xMax = loc.x + region.xMax,
+     .xMin = loc.x + region.xMin,
+     .yMax = loc.y + region.yMax,
+     .yMin = loc.y + region.yMin
+    };
+    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_BLACK);
+    Graphics_fillRectangle(this->getContext(), &region);
+}

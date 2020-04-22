@@ -10,12 +10,33 @@
 #include "i2c_task.h"
 
 
+void i2c_int_callback(uint_least8_t index) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    xTaskNotifyFromISR(i2c_task, I2C_THREAD_I2C_INT_FLAG, eSetBits, &xHigherPriorityTaskWoken);
+
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+static SemaphoreHandle_t adc_locked;
+
+void adc_timer_callback(TimerHandle_t xTimer) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    xTaskNotifyFromISR(i2c_task, I2C_THREAD_ADC_TIMER_FLAG, eSetBits, &xHigherPriorityTaskWoken);
+
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
 
 void i2c_task(void * par) {
+    uint32_t notify_flags = 0;
+    TimerHandle_t adc_delayer = xTimerCreate("adc_delayer", pdMS_TO_TICKS(50), pdFALSE, ADC_TIMER_ID,
+                                             adc_timer_callback);
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
 
-    AD7993_Config FG_AD7993_Handle = // TODO Move to task file
+    AD7993_Config FG_AD7993_Handle = // TODO Move to task files
     {
      .config = FINITY_GAUNTLET_AD7993_CONF,
      .cycle_timer = AD7993_CYCLE_TIMER_OFF,
@@ -33,50 +54,49 @@ void i2c_task(void * par) {
      .hysteresis[3] = FINITY_GAUNTLET_AD7993_HYSTERESIS
     };
 
-    Async_I2C_Handle * i2c_bus = AD7993_init(&FG_AD7993_Handle);
-    I2C_Transaction * test;
+    bool adc_read_active = false;
+    Async_I2C_Handle * AD7993 = AD7993_init(&FG_AD7993_Handle);
+    I2C_Transaction * adc_read;
 
     FG_GUI_init();
     logger.init();
     state_tracker.init();
 
-    uint32_t p1;
-    uint32_t p2;
-    uint32_t r[4];
-
-    char str0[20];
-    char str1[20];
-    char str2[20];
-    char str3[20];
-
-    int cx[4];
-
     while(1) {
-        Graphics_clearDisplay(&g_sContext);
-        test = AD7993_read_blocking(i2c_bus);
-        p1 = ((uint8_t *) (test->readBuf))[0];
-        p2 = ((uint8_t *) (test->readBuf))[1];
-        r[0] = ((p1 & 0x0F) << 8) | p2;
+        notify_flags = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(I2C_THREAD_POLL_PERIOD_MS));
 
-        p1 = ((uint8_t *) (test->readBuf))[2];
-        p2 = ((uint8_t *) (test->readBuf))[3];
-        r[1] = ((p1 & 0x0F) << 8) | p2;
+        if (notify_flags & I2C_THREAD_I2C_INT_FLAG) {
+            if (notify_flags & I2C_THREAD_ADC_TIMER_FLAG) {
+                adc_read = AD7993_start_read(AD7993);
+                adc_read_active = true;
+            }
+            else {
+                xTimerStart(adc_delayer, 0);
+            }
+        }
+        else if (notify_flags & I2C_THREAD_ADC_TIMER_FLAG) {
+            adc_read = AD7993_start_read(AD7993);
+            adc_read_active = true;
+        }
 
-        p1 = ((uint8_t *) (test->readBuf))[4];
-        p2 = ((uint8_t *) (test->readBuf))[5];
-        r[2] = ((p1 & 0x0F) << 8) | p2;
+        // Insert other I2C checks here
 
-        p1 = ((uint8_t *) (test->readBuf))[6];
-        p2 = ((uint8_t *) (test->readBuf))[7];
-        r[3] = ((p1 & 0x0F) << 8) | p2;
-
-        cx[0] = snprintf ( str0, 20, "Vin 1 -- %d", r[0]);
-        cx[1] = snprintf ( str1, 20, "Vin 2 -- %d", r[1]);
-        cx[2] = snprintf ( str2, 20, "Vin 3 -- %d", r[2]);
-        cx[3] = snprintf ( str3, 20, "Vin 4 -- %d", r[3]);
-
-        logger.print((int8_t *) str0, cx[0]);
-        state_tracker.update(6, (int8_t *) str1, cx[1], (int8_t *) str2, cx[2], (int8_t *) str3, cx[3]);
-        vTaskDelay(pdMS_TO_TICKS(800));
+        uint16_t r = 0;
+        if (adc_read_active) {
+            adc_read = AD7993_end_read(AD7993);
+            adc_read_active = false;
+            for (int i = 0; i < ADC7993_CH_CNT * 2; i += 2) {
+                r = AD7993_convert_result(static_cast<uint8_t *>(adc_read->readBuf)[i],
+                                          static_cast<uint8_t *>(adc_read->readBuf)[i + 1]);
+                if (r > I2C_THREAD_ADC_THRESH) {
+                    // TODO multiplex state stuff here
+                }
+            }
+        }
     }
+}
+
+void gui_update(GUI_Letter state, QueueHandle_t* mailroom)
+{
+    xQueueOverwrite(mailroom[GUI_THREAD_ID], &state);
 }

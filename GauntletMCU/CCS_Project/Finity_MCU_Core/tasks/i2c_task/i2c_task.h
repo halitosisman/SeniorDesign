@@ -20,6 +20,8 @@
 #include "GUI/FG_GUI.h" // TODO REMOVE ONCE SMAT IS DONE
 
 
+#define ADC_TIMER_ID 0
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +43,8 @@ extern QueueHandle_t i2c_event_box; // because there's no other way for sl_event
 
 */
 void i2c_task(void * par);
+
+void gui_update(GUI_State state, QueueHandle_t * mailroom);
 
 #ifdef __cplusplus
 }

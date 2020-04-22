@@ -23,13 +23,13 @@ extern "C" {
 #endif
 
 
-typedef struct _Letter {
-    uint8_t sig;
-    union {
-        int integer;
-        uint8_t char_array[LETTER_PAYLOAD_MAX_SIZE];
-    } payload;
-} Letter_t;
+typedef struct _GUI_State {
+    int8_t state_tracker[GUI_THREAD_STATE_TRACKER_STATE_CNT][GUI_THREAD_STATE_TRACKER_STATE_SIZE];
+    int16_t st_items[GUI_THREAD_STATE_TRACKER_STATE_CNT];
+    int8_t logger[GUI_THREAD_LOGGER_SIZE];
+    int16_t l_items;
+    uint8_t flags;
+} GUI_Letter;
 
 
 /*!
@@ -39,7 +39,7 @@ typedef struct _Letter {
  */
 typedef struct _FGthread_arg {
     QueueHandle_t mailroom[MAILBOX_CNT];
-
+    TaskHandle_t tasks[TASK_CNT];
 } FGthread_arg_t;
 
 /*!

@@ -21,21 +21,26 @@ int32_t fatfs_getFatTime(void) {
 
 
 void gui_task(void * par) {
+    GUI_Letter state;
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
-
-    int8_t msg[] = "Hello, World!";
-    int8_t s1[] = "State 1";
-    int8_t s2[] = "State 2";
-    int8_t s3[] = "State 3";
 
     FG_GUI_init();
     logger.init();
     state_tracker.init();
     while (1) {
-        logger.print(msg, sizeof(msg));
-        state_tracker.update(6, s1, sizeof(s1) - 1, s2, sizeof(s2) - 1, s3, sizeof(s3) - 1);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        state = gui_get_update(static_cast<FGthread_arg_t *>(par)->mailroom);
+        logger.print(state.logger, state.l_items);
+        state_tracker.update(6, state.state_tracker[GUI_THREAD_STATE_0_ID], state.st_items[GUI_THREAD_STATE_0_ID] - 1,
+                             state.state_tracker[GUI_THREAD_STATE_1_ID], state.st_items[GUI_THREAD_STATE_1_ID] - 1,
+                             state.state_tracker[GUI_THREAD_STATE_2_ID], state.st_items[GUI_THREAD_STATE_2_ID] - 1);
     }
 
+}
+
+GUI_Letter gui_get_update(QueueHandle_t* mailroom)
+{
+    GUI_Letter state;
+    xQueueReceive(mailroom[GUI_THREAD_ID], &GUI_State, pdMS_TO_TICKS(portMAX_DELAY));
+    return state;
 }

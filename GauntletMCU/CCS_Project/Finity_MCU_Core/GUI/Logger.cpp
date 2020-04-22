@@ -31,13 +31,12 @@ void Logger::print(int8_t * str, int size)
     Cord2D loc = this->getloc();
     Graphics_Rectangle clr_region =
     {
-     .xMax = loc.x + this->textbox_size.x - this->txt_start.x,
-     .xMin = loc.x + this->txt_start.x,
-     .yMax = loc.y + this->textbox_size.y - this->txt_start.y,
-     .yMin = loc.y + this->txt_start.y
+     .xMax = this->textbox_size.x,
+     .xMin = this->txt_start.x,
+     .yMax = this->textbox_size.y,
+     .yMin = this->txt_start.y
     };
-    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_BLACK);
-    Graphics_fillRectangle(this->getContext(), &clr_region);
+    this->clr_region(clr_region);
     Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
     this->drawString(str, size, this->txt_start.x, this->txt_start.y, true);
 }

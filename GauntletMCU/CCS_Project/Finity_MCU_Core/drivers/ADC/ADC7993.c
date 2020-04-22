@@ -114,11 +114,21 @@ I2C_Transaction * AD7993_read_blocking(Async_I2C_Handle * AD7993_Handle) {
     return result;
 }
 
+void AD7993_start_read(Async_I2C_Handle* AD7993_Handle)
+{
+    Async_I2C_enqueue(AD7993_Handle, &read_conv);
+}
 
+I2C_Transaction* AD7993_end_read(Async_I2C_Handle* AD7993_Handle)
+{
+    I2C_Transaction * result = Async_I2C_process(AD7993_Handle);
+    while (result == NULL) {
+        result = Async_I2C_process(AD7993_Handle);
+    }
+    return result;
+}
 
-
-
-
-
-
-
+uint16_t AD7993_convert_result(uint32_t MSB, uint32_t LSB)
+{
+    return ((MSB & 0x0F) << 8) | LSB;
+}

@@ -56,6 +56,7 @@ typedef enum CC3220SF_LAUNCHXL_SPIName {
     CC3220SF_LAUNCHXL_SPICOUNT
 } CC3220SF_LAUNCHXL_SPIName;
 
+void i2c_int_callback(uint_least8_t index);
 
 extern void CC3220SF_LAUNCHXL_initGeneral(void);
 

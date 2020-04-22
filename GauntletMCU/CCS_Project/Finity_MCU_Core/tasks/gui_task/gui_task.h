@@ -47,6 +47,7 @@ int32_t fatfs_getFatTime(void);
 */
 extern void gui_task(void * par);
 
+GUI_Letter gui_get_update(QueueHandle_t * mailroom);
 
 #ifdef __cplusplus
 }

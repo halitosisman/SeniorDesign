@@ -71,6 +71,9 @@ extern void AD7993_i2c_callback(I2C_Handle handle, I2C_Transaction *transaction,
 
 Async_I2C_Handle * AD7993_init(AD7993_Config * AD7993_config);
 I2C_Transaction * AD7993_read_blocking(Async_I2C_Handle * AD7993_Handle);
+void AD7993_start_read(Async_I2C_Handle * AD7993_Handle);
+I2C_Transaction * AD7993_end_read(Async_I2C_Handle * AD7993_Handle);
+uint16_t AD7993_convert_result(uint32_t MSB, uint32_t LSB);
 
 #ifdef __cplusplus
 }

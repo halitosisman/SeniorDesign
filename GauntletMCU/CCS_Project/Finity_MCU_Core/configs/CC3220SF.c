@@ -272,6 +272,8 @@ GPIO_PinConfig gpioPinConfigs[] =
      GPIOCC32XX_GPIO_09 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
      GPIOCC32XX_GPIO_10 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
      GPIOCC32XX_GPIO_11 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
+     // I2C_INT
+     GPIOCC32XX_GPIO_22 | GPIO_CFG_IN_NOPULL | GPIO_CFG_IN_INT_LOW
 };
 
 /*
@@ -298,7 +300,9 @@ GPIO_CallbackFxn gpioCallbackFunctions[] =
      NULL,
      NULL,
      NULL,
-     NULL
+     NULL,
+     //I2C_INT
+     i2c_int_callback
 };
 
 /*
@@ -307,8 +311,8 @@ GPIO_CallbackFxn gpioCallbackFunctions[] =
 const GPIOCC32XX_Config GPIOCC32XX_config = {
     .pinConfigs = (GPIO_PinConfig *)gpioPinConfigs,
     .callbacks = (GPIO_CallbackFxn *)gpioCallbackFunctions,
-    .numberOfPinConfigs = 11,
-    .numberOfCallbacks = 11,
+    .numberOfPinConfigs = sizeof(gpioPinConfigs) / sizeof(GPIO_PinConfig),
+    .numberOfCallbacks = sizeof(gpioPinConfigs) / sizeof(GPIO_PinConfig),
     .intPriority = (~0)
 };
 
