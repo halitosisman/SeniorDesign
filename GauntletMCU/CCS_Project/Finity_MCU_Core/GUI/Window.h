@@ -19,7 +19,7 @@ public:
 
     virtual Graphics_Context * getContext();
     virtual void setContext(Graphics_Context * context);
-
+    virtual Cord2D getloc();
 protected:
     virtual Cord2D transform_cord(int32_t x, int32_t y);
     virtual void drawString(int8_t *string, int32_t lLength, int32_t x, int32_t y, bool opaque);

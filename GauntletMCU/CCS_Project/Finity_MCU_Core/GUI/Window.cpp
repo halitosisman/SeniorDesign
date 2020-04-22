@@ -35,3 +35,8 @@ void Window::setContext(Graphics_Context * context)
 {
     this->context = context;
 }
+
+Cord2D Window::getloc()
+{
+    return this->loc;
+}

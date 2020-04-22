@@ -35,4 +35,5 @@ void State_Tracker::update(int num, ...)
         Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
         this->drawString(state, va_arg(valist, int), this->locs[i / 2].x, this->locs[i / 2].y, true);
     }
+    va_end(valist);
 }
