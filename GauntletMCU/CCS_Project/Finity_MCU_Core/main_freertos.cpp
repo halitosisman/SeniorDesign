@@ -34,6 +34,9 @@
  *  ======== main_freertos.c ========
  */
 
+
+#include "string.h"
+
 /* RTOS header files */
 #include <tasks/gui_task/gui_task.h>
 #include <tasks/i2c_task/i2c_task.h>
@@ -54,6 +57,8 @@ int main(void)
 {
     FGthread_arg_t thread_args;
     T_Params net_arg;
+    T_Params i2c_arg;
+    T_Params gui_arg;
 
     /* Call driver init functions */
     Board_init();
@@ -62,14 +67,29 @@ int main(void)
     thread_args.mailroom[GUI_THREAD_ID] = xQueueCreate(1, sizeof(GUI_Letter));
 
     // Network Thread Initialization
-    net_arg.pcName = static_cast<char *>("i2c");
-    net_arg.pvParameters = &thread_args;
-    net_arg.pvTaskCode = i2c_task;
-    net_arg.pxCreatedTask = NULL; // TODO, setup task handles for notify calls
-    net_arg.usStackDepth = I2C_THREAD_STACK_SIZE;
-    net_arg.uxPriority = I2C_THREAD_PRIORITY;
+    i2c_arg.pcName = static_cast<char *>("i2c");
+    i2c_arg.pvParameters = &thread_args;
+    i2c_arg.pvTaskCode = i2c_task;
+    i2c_arg.pxCreatedTask = &(thread_args.tasks[I2C_THREAD_ID]);
+    i2c_arg.usStackDepth = I2C_THREAD_STACK_SIZE;
+    i2c_arg.uxPriority = I2C_THREAD_PRIORITY;
+    FGcreate_task(i2c_arg);
 
+    net_arg.pcName = static_cast<char *>("net");
+    net_arg.pvParameters = &thread_args;
+    net_arg.pvTaskCode = NULL;
+    net_arg.pxCreatedTask = &(thread_args.tasks[NET_THREAD_ID]);
+    net_arg.usStackDepth = NET_TASK_STACK_SIZE;
+    net_arg.uxPriority = NET_TASK_PRIORITY;
     FGcreate_task(net_arg);
+
+    gui_arg.pcName = static_cast<char *>("gui");
+    gui_arg.pvParameters = &thread_args;
+    gui_arg.pvTaskCode = gui_task;
+    gui_arg.pxCreatedTask = &(thread_args.tasks[GUI_THREAD_ID]);
+    gui_arg.usStackDepth = GUI_THREAD_STACK_SIZE;
+    gui_arg.uxPriority = GUI_THREAD_PRIORITY;
+    FGcreate_task(gui_arg);
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();

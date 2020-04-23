@@ -14,12 +14,12 @@
 
 class Window {
 public:
-    explicit Window(Graphics_Context * context, Cord2D loc);
+    explicit Window(Graphics_Context * context, Cord2S loc);
     virtual void init()=0;
 
     virtual Graphics_Context * getContext();
     virtual void setContext(Graphics_Context * context);
-    virtual Cord2D getloc();
+    virtual Cord2S getloc();
     virtual void clr_region(Graphics_Rectangle region);
 protected:
     virtual Cord2D transform_cord(int32_t x, int32_t y);
@@ -27,7 +27,7 @@ protected:
 
 private:
     Graphics_Context * context;
-    Cord2D loc;
+    Cord2S loc;
 };
 
 

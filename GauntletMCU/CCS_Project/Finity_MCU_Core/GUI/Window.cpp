@@ -7,7 +7,7 @@
 
 #include <GUI/Window.h>
 
-Window::Window(Graphics_Context * context, Cord2D loc)
+Window::Window(Graphics_Context * context, Cord2S loc)
 {
     this->context = context;
     this->loc = loc;
@@ -36,7 +36,7 @@ void Window::setContext(Graphics_Context * context)
     this->context = context;
 }
 
-Cord2D Window::getloc()
+Cord2S Window::getloc()
 {
     return this->loc;
 }
@@ -45,11 +45,11 @@ void Window::clr_region(Graphics_Rectangle region)
 {
     Graphics_Rectangle clr_region =
     {
-     .xMax = loc.x + region.xMax,
-     .xMin = loc.x + region.xMin,
-     .yMax = loc.y + region.yMax,
-     .yMin = loc.y + region.yMin
+     .xMax = this->loc.x + region.xMax,
+     .xMin = this->loc.x + region.xMin,
+     .yMax = this->loc.y + region.yMax,
+     .yMin = this->loc.y + region.yMin
     };
     Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_BLACK);
-    Graphics_fillRectangle(this->getContext(), &region);
+    Graphics_fillRectangle(this->getContext(), &clr_region);
 }

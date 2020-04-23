@@ -41,6 +41,6 @@ void gui_task(void * par) {
 GUI_Letter gui_get_update(QueueHandle_t* mailroom)
 {
     GUI_Letter state;
-    xQueueReceive(mailroom[GUI_THREAD_ID], &GUI_State, pdMS_TO_TICKS(portMAX_DELAY));
+    xQueueReceive(mailroom[GUI_THREAD_ID], &state, pdMS_TO_TICKS(portMAX_DELAY));
     return state;
 }

@@ -45,10 +45,19 @@
 #ifndef __CC3220SF_LAUNCHXL_H
 #define __CC3220SF_LAUNCHXL_H
 
+
+#include "stdint.h"
+
+/* Common interface includes                                                 */
+#include "tasks/net_task/network_if.h"
+#include "util/uart_term.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+UART_Handle uart_debug;
 
 typedef enum CC3220SF_LAUNCHXL_SPIName {
     CC3220SF_LAUNCHXL_SPI0 = 0,

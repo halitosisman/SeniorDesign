@@ -15,6 +15,9 @@
 #include "tasks/FGtask.h"
 #include "drivers/ADC/ADC7993.h"
 #include "stdio.h"
+#include "timers.h"
+
+#include "configs/Board.h"
 
 #include "drivers/LCD/FG_graphics.h"
 #include "GUI/FG_GUI.h" // TODO REMOVE ONCE SMAT IS DONE
@@ -44,7 +47,7 @@ extern QueueHandle_t i2c_event_box; // because there's no other way for sl_event
 */
 void i2c_task(void * par);
 
-void gui_update(GUI_State state, QueueHandle_t * mailroom);
+void gui_update(GUI_Letter state, QueueHandle_t * mailroom);
 
 #ifdef __cplusplus
 }

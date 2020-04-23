@@ -10,26 +10,28 @@
 #include "i2c_task.h"
 
 
+static TaskHandle_t i2c_task_handle;
+
+
 void i2c_int_callback(uint_least8_t index) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    xTaskNotifyFromISR(i2c_task, I2C_THREAD_I2C_INT_FLAG, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyFromISR(i2c_task_handle, I2C_THREAD_I2C_INT_FLAG, eSetBits, &xHigherPriorityTaskWoken);
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-static SemaphoreHandle_t adc_locked;
-
 void adc_timer_callback(TimerHandle_t xTimer) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    xTaskNotifyFromISR(i2c_task, I2C_THREAD_ADC_TIMER_FLAG, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyFromISR(i2c_task_handle, I2C_THREAD_ADC_TIMER_FLAG, eSetBits, &xHigherPriorityTaskWoken);
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 
 void i2c_task(void * par) {
+    i2c_task_handle = ((FGthread_arg_t *) par)->tasks[I2C_THREAD_ID];
     uint32_t notify_flags = 0;
     TimerHandle_t adc_delayer = xTimerCreate("adc_delayer", pdMS_TO_TICKS(50), pdFALSE, ADC_TIMER_ID,
                                              adc_timer_callback);
@@ -67,7 +69,7 @@ void i2c_task(void * par) {
 
         if (notify_flags & I2C_THREAD_I2C_INT_FLAG) {
             if (notify_flags & I2C_THREAD_ADC_TIMER_FLAG) {
-                adc_read = AD7993_start_read(AD7993);
+                AD7993_start_read(AD7993);
                 adc_read_active = true;
             }
             else {
@@ -75,7 +77,7 @@ void i2c_task(void * par) {
             }
         }
         else if (notify_flags & I2C_THREAD_ADC_TIMER_FLAG) {
-            adc_read = AD7993_start_read(AD7993);
+             AD7993_start_read(AD7993);
             adc_read_active = true;
         }
 

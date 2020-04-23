@@ -50,6 +50,8 @@
 #define LCD_D6 9
 #define LCD_D7 10
 
+#define CONFIG_UART_0               0
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -17,7 +17,7 @@
 };*/
 
 
-static Cord2D log_loc = {0, 199};
+static Cord2S log_loc = {0, 199};
 
 Logger::Logger() : Window(&g_sContext, log_loc)
 {
@@ -28,7 +28,7 @@ Logger::Logger() : Window(&g_sContext, log_loc)
 
 void Logger::print(int8_t * str, int size)
 {
-    Cord2D loc = this->getloc();
+    Cord2S loc = this->getloc();
     Graphics_Rectangle clr_region =
     {
      .xMax = this->textbox_size.x,
@@ -50,4 +50,8 @@ void Logger::init()
     this->txt_start.y = this->prompt_start.y;
     Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
     this->drawString(prompt_str, sizeof(prompt_str) - 1, this->prompt_start.x, this->prompt_start.y, true);
+}
+
+void Logger::print(int n)
+{
 }

@@ -131,6 +131,10 @@ void Board_init(void)
     GPIO_init();
     SPI_init();
     I2C_init();
+    /*Configure the UART                                                     */
+    uart_debug = InitTerm();
+    /*remove uart receive from LPDS dependency                               */
+    UART_control(uart_debug, UART_CMD_RXDISABLE, NULL);
 }
 
 
@@ -423,6 +427,84 @@ const SPI_Config SPI_config[CC3220SF_LAUNCHXL_SPICOUNT] = {
 };
 
 const uint_least8_t SPI_count = CC3220SF_LAUNCHXL_SPICOUNT;
+
+
+/*
+ *  ============================= Display =============================
+ */
+
+#include <ti/display/Display.h>
+#include <ti/display/DisplayUart.h>
+
+#define Display_UARTBUFFERSIZE 1024
+static char displayUARTBuffer[Display_UARTBUFFERSIZE];
+
+DisplayUart_Object displayUartObject;
+
+const DisplayUart_HWAttrs displayUartHWAttrs = {
+    .uartIdx      = CONFIG_UART_0,
+    .baudRate     = 115200,
+    .mutexTimeout = (unsigned int)(-1),
+    .strBuf       = displayUARTBuffer,
+    .strBufLen    = Display_UARTBUFFERSIZE
+};
+
+const Display_Config Display_config[] = {
+    /* CONFIG_Display_0 */
+    /* XDS110 UART */
+    {
+        .fxnTablePtr = &DisplayUartMin_fxnTable,
+        .object      = &displayUartObject,
+        .hwAttrs     = &displayUartHWAttrs
+    },
+};
+
+const uint_least8_t Display_count = 1;
+
+
+/*
+ *  =============================== UART ===============================
+ */
+
+#include <ti/drivers/UART.h>
+#include <ti/devices/cc32xx/inc/hw_ints.h>
+#include <ti/devices/cc32xx/inc/hw_memmap.h>
+#include <ti/drivers/uart/UARTCC32XXDMA.h>
+
+#define CONFIG_UART_COUNT 1
+
+#define UART0_BASE UARTA0_BASE
+#define UART1_BASE UARTA1_BASE
+#define INT_UART0  INT_UARTA0
+#define INT_UART1  INT_UARTA1
+
+
+UARTCC32XXDMA_Object uartCC32XXObjects0;
+
+static const UARTCC32XXDMA_HWAttrsV1 uartCC32XXHWAttrs0 = {
+    .baseAddr           = UART0_BASE,
+    .intNum             = INT_UART0,
+    .intPriority        = (~0),
+    .flowControl        = UARTCC32XXDMA_FLOWCTRL_NONE,
+    .rxChannelIndex     = UDMA_CH8_UARTA0_RX,
+    .txChannelIndex     = UDMA_CH9_UARTA0_TX,
+    .rxPin              = UARTCC32XXDMA_PIN_57_UART0_RX,
+    .txPin              = UARTCC32XXDMA_PIN_55_UART0_TX,
+    .ctsPin             = UARTCC32XXDMA_PIN_UNASSIGNED,
+    .rtsPin             = UARTCC32XXDMA_PIN_UNASSIGNED,
+    .errorFxn           = NULL
+  };
+
+const UART_Config UART_config[CONFIG_UART_COUNT] = {
+    {   /* CONFIG_UART_0 */
+        .fxnTablePtr = &UARTCC32XXDMA_fxnTable,
+        .object      = &uartCC32XXObjects0,
+        .hwAttrs     = &uartCC32XXHWAttrs0
+    },
+};
+
+const uint_least8_t UART_count = CONFIG_UART_COUNT;
+
 
 
 

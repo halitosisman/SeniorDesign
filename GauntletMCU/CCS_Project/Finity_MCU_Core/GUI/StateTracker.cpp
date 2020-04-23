@@ -8,7 +8,7 @@
 #include <GUI/StateTracker.h>
 
 
-static Cord2D log_loc = {0, 0};
+static Cord2S log_loc = {0, 0};
 
 State_Tracker::State_Tracker() : Window(&g_sContext, log_loc)
 {
@@ -30,7 +30,7 @@ void State_Tracker::init() {
 
 void State_Tracker::update(int num, ...)
 {
-    Cord2D loc = this->getloc();
+    Cord2S loc = this->getloc();
     Graphics_Rectangle clr_region;
     va_list valist;
     va_start(valist, num);

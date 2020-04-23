@@ -18,6 +18,10 @@ struct Cord2D {
     int y;
 };
 
+struct Cord2S {
+    short x;
+    short y;
+};
 
 #ifdef __cplusplus
 }
