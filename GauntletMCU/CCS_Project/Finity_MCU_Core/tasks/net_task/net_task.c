@@ -232,6 +232,30 @@ struct Command_List command_list =
     NULL, 0,
 };
 
+void publish_command(void * device, struct Command* command)
+{
+    if (device == NULL)
+    {
+        // System
+        MQTTClient_publish(gMqttClient,
+                           (char *) SYSTEM_PUB_TOPIC,
+                           SYSTEM_PUB_TOPIC_LEN,
+                           (char *) command->command,
+                           command->command_len,
+                           MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+    }
+    else
+    {
+        // Device
+        MQTTClient_publish(gMqttClient,
+                           (char *)((struct Light*) device).pub_topic,
+                           23,
+                           (char *) command->command,
+                           command->command_len,
+                           MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+    }
+}
+
 void add_command(struct Command* head, char * name, int name_len, char * ID, char * command_name, int command_len)
 {
     struct Command* command = (struct Command*) malloc(sizeof(struct Command));
@@ -1022,6 +1046,10 @@ void * MqttClient(void *pvParameters)
             pthread_exit(0);
             return(NULL);
 
+        case USR_CMD:
+            // TODO Hook in my I2C functionality here
+            break;
+
         default:
             sleep(1);
             break;
@@ -1502,7 +1530,9 @@ int32_t DisplayAppBanner(char* appName,
 }
 
 
-static void net_init() {
+void net_task(void * par) {
+    uint32_t count = 0;
+
     pthread_attr_t pAttrs_spawn;
     pthread_t spawn_thread = (pthread_t) NULL;
     struct sched_param priParam;
@@ -1572,14 +1602,6 @@ static void net_init() {
             ;
         }
     }
-
-}
-
-
-void net_task(void * par) {
-    uint32_t count = 0;
-
-    net_init();
 
     while(1)
     {

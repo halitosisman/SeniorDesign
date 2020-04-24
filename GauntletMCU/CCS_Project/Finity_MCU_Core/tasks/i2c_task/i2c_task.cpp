@@ -30,6 +30,7 @@ void adc_timer_callback(TimerHandle_t xTimer) {
 }
 
 
+
 void i2c_task(void * par) {
     i2c_task_handle = ((FGthread_arg_t *) par)->tasks[I2C_THREAD_ID];
     uint32_t notify_flags = 0;
@@ -60,6 +61,7 @@ void i2c_task(void * par) {
     Async_I2C_Handle * AD7993 = AD7993_init(&FG_AD7993_Handle);
     I2C_Transaction * adc_read;
 
+    init_FG_state();
     FG_GUI_init();
     logger.init();
     state_tracker.init();
@@ -83,11 +85,13 @@ void i2c_task(void * par) {
 
         // Insert other I2C checks here
 
+        vTaskDelay(pdMS_TO_TICKS(1)); // Wait for I2C transactions to finish
+
         uint16_t r = 0;
         if (adc_read_active) {
             adc_read = AD7993_end_read(AD7993);
             adc_read_active = false;
-            for (int i = 0; i < ADC7993_CH_CNT * 2; i += 2) {
+            for (uint8_t i = 0; i < ADC7993_CH_CNT * 2; i += 2) {
                 r = AD7993_convert_result(static_cast<uint8_t *>(adc_read->readBuf)[i],
                                           static_cast<uint8_t *>(adc_read->readBuf)[i + 1]);
                 if (r > I2C_THREAD_ADC_THRESH) {

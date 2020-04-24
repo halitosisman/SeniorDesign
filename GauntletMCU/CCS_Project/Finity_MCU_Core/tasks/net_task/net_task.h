@@ -273,6 +273,17 @@ extern "C" {
 //////////////////////
 
 
+// Basically the C version of a base class for the other devices
+struct Device {
+    struct State* next;
+    struct State* prev;
+    char name[20];
+    int name_len;
+    char ID[9];
+    float status;
+};
+
+
 struct Light {
     struct Light* next;
     struct Light* prev;
@@ -383,6 +394,8 @@ struct Command_List {
 //*****************************************************************************
 
 
+extern struct Device_List device_list;
+extern struct Command_List command_list;
 
 //*****************************************************************************
 //                      LOCAL FUNCTION PROTOTYPES

@@ -10,20 +10,22 @@
 
 
 #define I2C_MAX_BLOCK_TIME_MS 500
-
+#define ADC_TIMER_ID 0
 
 #include "tasks/FGtask.h"
 #include "drivers/ADC/ADC7993.h"
 #include "stdio.h"
 #include "timers.h"
+#include "tasks/net_task/net_task.h"
 
 #include "configs/Board.h"
+#include "util/uart_term.h"
+#include "util/error_manifest.h"
 
 #include "drivers/LCD/FG_graphics.h"
 #include "GUI/FG_GUI.h" // TODO REMOVE ONCE SMAT IS DONE
 
 
-#define ADC_TIMER_ID 0
 
 #ifdef __cplusplus
 extern "C" {
