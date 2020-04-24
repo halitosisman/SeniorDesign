@@ -683,7 +683,6 @@ void * MqttClient(void *pvParameters)
     long lRetVal = -1;
     char *tmpBuff;
 
-
     /*Initializing Client and Subscribing to the Broker.                     */
     if(gApConnectionState >= 0)
     {
@@ -716,8 +715,7 @@ void * MqttClient(void *pvParameters)
         case MSG_RECV_BY_CLIENT:
             tmpBuff = (char *) ((char *) queueElemRecv.msgPtr + 12);
             // status/#
-            if(strncmp
-                (tmpBuff, SUBSCRIPTION_TOPIC0, 7) == 0)
+            if(strncmp(tmpBuff, SUBSCRIPTION_TOPIC0, 7) == 0)
             {
                 // light, motor, accel, tempr, or special
                 char *tmpType = (char *)((char *)tmpBuff + 7);
@@ -761,13 +759,13 @@ void * MqttClient(void *pvParameters)
 
                     switch(code)
                     {
-                        case 0:
+                    case 0:
                         //Update connected devices
-                            update_devices();
-                            break;
-                        case 1:
+                        update_devices();
+                        break;
+                    case 1:
                         // Init Command Lists
-                            init_command_list();
+                        init_command_list();
                     }
 
                 }
@@ -831,10 +829,10 @@ void * MqttClient(void *pvParameters)
                             dimmable, tmp_Light->pub_topic);
 
                     MQTTClient_publish(gMqttClient, (char *) tmp_Light->pub_topic,
-                          23,
-                          (char *) LIGHT_CONNECTION_CONFIRM,
-                          LIGHT_CONNECTION_CONFIRM_LEN,
-                          MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+                                       23,
+                                       (char *) LIGHT_CONNECTION_CONFIRM,
+                                       LIGHT_CONNECTION_CONFIRM_LEN,
+                                       MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
                     add_device(0, tmp_Light);
                 }
@@ -895,10 +893,10 @@ void * MqttClient(void *pvParameters)
                             reversable, setable, tmpMotor->pub_topic);
 
                     MQTTClient_publish(gMqttClient, (char *) tmpMotor->pub_topic,
-                          23,
-                          (char *) MOTOR_CONNECTION_CONFIRM,
-                          MOTOR_CONNECTION_CONFIRM_LEN,
-                          MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+                                       23,
+                                       (char *) MOTOR_CONNECTION_CONFIRM,
+                                       MOTOR_CONNECTION_CONFIRM_LEN,
+                                       MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
                     add_device(1, tmpMotor);
                 }
@@ -945,10 +943,10 @@ void * MqttClient(void *pvParameters)
                             setable, tmp_Accel->pub_topic);
 
                     MQTTClient_publish(gMqttClient, (char *) tmp_Accel->pub_topic,
-                          23,
-                          (char *) ACCEL_CONNECTION_CONFIRM,
-                          ACCEL_CONNECTION_CONFIRM_LEN,
-                          MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+                                       23,
+                                       (char *) ACCEL_CONNECTION_CONFIRM,
+                                       ACCEL_CONNECTION_CONFIRM_LEN,
+                                       MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
                     add_device(2, tmp_Accel);
                 }
@@ -995,10 +993,10 @@ void * MqttClient(void *pvParameters)
                             setable, tmp_Temp->pub_topic);
 
                     MQTTClient_publish(gMqttClient, (char *) tmp_Temp->pub_topic,
-                          23,
-                          (char *) TEMP_CONNECTION_CONFIRM,
-                          TEMP_CONNECTION_CONFIRM_LEN,
-                          MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+                                       23,
+                                       (char *) TEMP_CONNECTION_CONFIRM,
+                                       TEMP_CONNECTION_CONFIRM_LEN,
+                                       MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
                     add_device(3, tmp_Temp);
                 }
@@ -1007,14 +1005,14 @@ void * MqttClient(void *pvParameters)
             free(queueElemRecv.msgPtr);
             break;
 
-        /*On-board client disconnected from remote broker, only      */
-        /*local MQTT network will work                               */
+            /*On-board client disconnected from remote broker, only      */
+            /*local MQTT network will work                               */
         case LOCAL_CLIENT_DISCONNECTION:
             UART_PRINT("\n\rOn-board Client Disconnected\n\r\r\n");
             gUiConnFlag = 0;
             break;
 
-        /*Push button for full restart check                         */
+            /*Push button for full restart check                         */
         case DISC_PUSH_BUTTON_PRESSED:
             gResetApplication = true;
             break;
