@@ -17,18 +17,15 @@
 
 #include "configs/thread_config.h"
 
+#include "state.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 typedef struct _GUI_State {
-    int8_t state_tracker[GUI_THREAD_STATE_TRACKER_STATE_CNT][GUI_THREAD_STATE_TRACKER_STATE_SIZE];
-    int16_t st_items[GUI_THREAD_STATE_TRACKER_STATE_CNT];
-    int8_t logger[GUI_THREAD_LOGGER_SIZE];
-    int16_t l_items;
-    uint8_t flags;
+    FG_State state;
 } GUI_Letter;
 
 

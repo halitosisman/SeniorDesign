@@ -30,10 +30,10 @@ void gui_task(void * par) {
     state_tracker.init();
     while (1) {
         state = gui_get_update(static_cast<FGthread_arg_t *>(par)->mailroom);
-        logger.print(state.logger, state.l_items);
+       /* logger.print(state.logger, state.l_items);
         state_tracker.update(6, state.state_tracker[GUI_THREAD_STATE_0_ID], state.st_items[GUI_THREAD_STATE_0_ID] - 1,
                              state.state_tracker[GUI_THREAD_STATE_1_ID], state.st_items[GUI_THREAD_STATE_1_ID] - 1,
-                             state.state_tracker[GUI_THREAD_STATE_2_ID], state.st_items[GUI_THREAD_STATE_2_ID] - 1);
+                             state.state_tracker[GUI_THREAD_STATE_2_ID], state.st_items[GUI_THREAD_STATE_2_ID] - 1);*/
     }
 
 }

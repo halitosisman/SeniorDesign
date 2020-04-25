@@ -95,7 +95,7 @@ void i2c_task(void * par) {
                 r = AD7993_convert_result(static_cast<uint8_t *>(adc_read->readBuf)[i],
                                           static_cast<uint8_t *>(adc_read->readBuf)[i + 1]);
                 if (r > I2C_THREAD_ADC_THRESH) {
-                    // TODO multiplex state stuff here
+                    update_FG_state(static_cast<Nav>(i));
                 }
             }
         }

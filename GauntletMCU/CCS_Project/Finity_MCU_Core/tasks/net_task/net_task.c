@@ -209,29 +209,6 @@ void * MqttClientThread(void * pvParameters)
 //!
 //*****************************************************************************
 
-
-struct Device_List device_list =
-{
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0
-};
-
-struct Command_List command_list =
-{
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-    NULL, 0,
-};
-
 void publish_command(void * device, struct Command* command)
 {
     if (device == NULL)
@@ -248,7 +225,7 @@ void publish_command(void * device, struct Command* command)
     {
         // Device
         MQTTClient_publish(gMqttClient,
-                           (char *)((struct Light*) device).pub_topic,
+                           (char *)(((struct Light*) device)->pub_topic),
                            23,
                            (char *) command->command,
                            command->command_len,
