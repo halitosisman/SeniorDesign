@@ -26,6 +26,7 @@ extern "C" {
 
 typedef struct _GUI_State {
     FG_State state;
+    bool cmd_issued;
 } GUI_Letter;
 
 

@@ -34,7 +34,7 @@ typedef enum {
     Device_Temp,
     Device_System,
     Device_Count,
-    Command,
+    Device_Command,
     State_Count
 } State_List;
 

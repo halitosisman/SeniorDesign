@@ -115,9 +115,10 @@ static bool device_light_callback(uint8_t event) {
         else {
             FG_user_state.selected_command = command_list.L;
         }
-        present_callback = state_callbacks[Command];
+        present_callback = state_callbacks[Device_Command];
         return false;
     case Nav_Left:
+        FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
         return false;
     default:
@@ -153,9 +154,10 @@ static bool device_motor_callback(uint8_t event) {
         else {
             FG_user_state.selected_command = command_list.M;
         }
-        present_callback = state_callbacks[Command];
+        present_callback = state_callbacks[Device_Command];
         return false;
     case Nav_Left:
+        FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
         return false;
     default:
@@ -185,9 +187,10 @@ static bool device_accel_callback(uint8_t event) {
         else {
             FG_user_state.selected_command = command_list.A;
         }
-        present_callback = state_callbacks[Command];
+        present_callback = state_callbacks[Device_Command];
         return false;
     case Nav_Left:
+        FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
         return false;
     default:
@@ -217,9 +220,10 @@ static bool device_temp_callback(uint8_t event) {
         else {
             FG_user_state.selected_command = command_list.T;
         }
-        present_callback = state_callbacks[Command];
+        present_callback = state_callbacks[Device_Command];
         return false;
     case Nav_Left:
+        FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
         return false;
     default:
@@ -240,11 +244,10 @@ static bool command_callback(uint8_t event) {
         }
         return false;
     case Nav_Right:
-        // TODO update and reset
-        return false;
+        return true; // no state update, but trigger action
     case Nav_Left:
         FG_user_state.selected_command = NULL;
-        present_callback = state_callbacks[Command];
+        present_callback = state_callbacks[Device_Command];
         return false;
     default:
         break;

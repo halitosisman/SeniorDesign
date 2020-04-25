@@ -11,6 +11,8 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <mqueue.h>
 
 //*****************************************************************************
 //                          LOCAL DEFINES
@@ -358,6 +360,7 @@ struct Command_List {
     int S_len;
 };
 
+extern mqd_t g_PBQueue;
 extern struct Device_List device_list;
 extern struct Command_List command_list;
 
