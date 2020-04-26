@@ -20,51 +20,65 @@ int32_t fatfs_getFatTime(void) {
 }
 
 
-GUI_Letter gui_get_update(QueueHandle_t * mailroom);
+static bool gui_get_update()
+{
+    if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(BACKGROUND_UPDATE_PERIOD_MS))) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
+struct Command empty =
+{
+ .name = " ",
+ .name_len = sizeof(" ")
+};
 void gui_task(void * par) {
-    //GUI_Letter prev_state;
-    GUI_Letter state;
+    bool cmd_issued = false;
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
 
+    taskENTER_CRITICAL();
     FG_GUI_init();
     logger.init();
     state_tracker.init();
+    taskEXIT_CRITICAL();
     while (1) {
-        prev_state = state;
-        state = gui_get_update(static_cast<FGthread_arg_t *>(par)->mailroom);
-        if (state.cmd_issued) {
+        cmd_issued = gui_get_update();
+        if (cmd_issued) {
             // ignore for now
         }
         else {
             struct Command * cmd[3];
-            strcpy(cmd[0]->name, " ");
-            cmd[0]->command_len = sizeof(" ");
-            strcpy(cmd[2]->name, " ");
-            cmd[2]->command_len = sizeof(" ");
+            // If at the edge of a selection, fill the top or bottom entry with a blank
+            cmd[0] = &empty;
+            cmd[2] = &empty;
 
-            if (state.state.selected_command != NULL) {
-                if (state.state.selected_command->next != NULL) {
-                    cmd[0] = state.state.selected_command->next;
+            // User is not in the command selection screen
+            if (FG_user_state.selected_command != NULL) {
+                if (FG_user_state.selected_command->next != NULL) {
+                    cmd[0] = FG_user_state.selected_command->next;
                 }
-                if (state.state.selected_command->prev != NULL) {
-                    cmd[2] = state.state.selected_command->prev;
+                if (FG_user_state.selected_command->prev != NULL) {
+                    cmd[2] = FG_user_state.selected_command->prev;
                 }
-                cmd[1] = state.state.selected_command;
+                cmd[1] = FG_user_state.selected_command;
             }
-
-            else if (state.state.selected_device != NULL) {
-                if (state.state.selected_device->next != NULL) {
-                    cmd[0] = (Command *) state.state.selected_device->next;
+            // User is not in the device selection screen
+            else if (FG_user_state.selected_device != NULL) {
+                if (FG_user_state.selected_device->next != NULL) {
+                    cmd[0] = (Command *) FG_user_state.selected_device->next;
                 }
-                if (state.state.selected_device->prev != NULL) {
-                    cmd[2] = (Command *) state.state.selected_device->prev;
+                if (FG_user_state.selected_device->prev != NULL) {
+                    cmd[2] = (Command *) FG_user_state.selected_device->prev;
                 }
-                cmd[1] = (Command *) state.state.selected_device;
+                cmd[1] = (Command *) FG_user_state.selected_device;
             }
+            // Therefore the user must be in the device type selection screen!
             else {
-                switch (state.state.device_type) {
+                switch (FG_user_state.device_type) {
                 case Device_Light:
                     strcpy(cmd[1]->name, "Light");
                     cmd[1]->name_len = sizeof("Light");
@@ -95,16 +109,11 @@ void gui_task(void * par) {
                     break;
                 }
             }
+            taskENTER_CRITICAL();
             state_tracker.update(6, cmd[0]->name, cmd[0]->name_len, cmd[1]->name, cmd[1]->name_len, cmd[2]->name,
                                  cmd[2]->name_len);
+            taskEXIT_CRITICAL();
         }
     }
 
-}
-
-GUI_Letter gui_get_update(QueueHandle_t* mailroom)
-{
-    GUI_Letter state;
-    xQueueReceive(mailroom[GUI_THREAD_ID], &state, pdMS_TO_TICKS(portMAX_DELAY));
-    return state;
 }

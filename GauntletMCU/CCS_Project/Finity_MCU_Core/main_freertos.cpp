@@ -48,14 +48,13 @@
 #include "configs/Board.h"
 #include "configs/thread_config.h"
 
-
+FGthread_arg_t thread_args;
 
 /*
  *  ======== main ========
  */
 int main(void)
 {
-    FGthread_arg_t thread_args;
     T_Params net_arg;
     T_Params i2c_arg;
     T_Params gui_arg;
@@ -74,21 +73,21 @@ int main(void)
     i2c_arg.usStackDepth = I2C_THREAD_STACK_SIZE;
     i2c_arg.uxPriority = I2C_THREAD_PRIORITY;
     FGcreate_task(i2c_arg);
-
+/*
     net_arg.pcName = static_cast<char *>("net");
     net_arg.pvParameters = &thread_args;
     net_arg.pvTaskCode = NULL;
     net_arg.pxCreatedTask = &(thread_args.tasks[NET_THREAD_ID]);
     net_arg.usStackDepth = NET_TASK_STACK_SIZE;
-    net_arg.uxPriority = NET_TASK_PRIORITY;
+    net_arg.uxPriority = NET_TASK_SPAWNER_PRIORITY;
     FGcreate_task(net_arg);
-
+*/
     gui_arg.pcName = static_cast<char *>("gui");
     gui_arg.pvParameters = &thread_args;
     gui_arg.pvTaskCode = gui_task;
     gui_arg.pxCreatedTask = &(thread_args.tasks[GUI_THREAD_ID]);
     gui_arg.usStackDepth = GUI_THREAD_STACK_SIZE;
-    gui_arg.uxPriority = GUI_THREAD_PRIORITY;
+    gui_arg.uxPriority = 5;//GUI_THREAD_PRIORITY; TEMPORARILY 5 FOR TESTING
     FGcreate_task(gui_arg);
 
     /* Start the FreeRTOS scheduler */

@@ -65,6 +65,22 @@ typedef enum CC3220SF_LAUNCHXL_SPIName {
     CC3220SF_LAUNCHXL_SPICOUNT
 } CC3220SF_LAUNCHXL_SPIName;
 
+typedef enum GPIO_Settings {
+    GPIO_RDX = 0,
+    GPIO_WRX,
+    GPIO_DCX,
+    GPIO_D7,
+    GPIO_D6,
+    GPIO_D5,
+    GPIO_D4,
+    GPIO_D3,
+    GPIO_D2,
+    GPIO_D1,
+    GPIO_D0,
+    GPIO_I2C_Int,
+    GPIO_Pin_Count
+};
+
 void i2c_int_callback(uint_least8_t index);
 
 extern void CC3220SF_LAUNCHXL_initGeneral(void);

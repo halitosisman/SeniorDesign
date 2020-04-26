@@ -277,7 +277,7 @@ GPIO_PinConfig gpioPinConfigs[] =
      GPIOCC32XX_GPIO_10 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
      GPIOCC32XX_GPIO_11 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
      // I2C_INT
-     GPIOCC32XX_GPIO_22 | GPIO_CFG_IN_NOPULL | GPIO_CFG_IN_INT_LOW
+     GPIOCC32XX_GPIO_22 | GPIO_CFG_IN_PU
 };
 
 /*
@@ -288,7 +288,7 @@ GPIO_PinConfig gpioPinConfigs[] =
  *  reduce memory usage by enabling callback table optimization
  *  (GPIO.optimizeCallbackTableSize = true)
  */
-GPIO_CallbackFxn gpioCallbackFunctions[] =
+GPIO_CallbackFxn gpioCallbackFunctions[GPIO_Pin_Count] =
 {
      // RDX
      NULL,

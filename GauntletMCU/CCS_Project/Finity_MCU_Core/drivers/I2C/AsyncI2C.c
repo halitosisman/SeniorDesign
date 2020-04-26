@@ -10,6 +10,8 @@
 
 
 void Async_I2C_callback(I2C_Handle handle, I2C_Transaction *transaction, bool transferStatus) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
     if (transaction->arg == NULL) { // transaction->arg should always be a pointer to the Async handle
         while (1) {
 
@@ -25,7 +27,9 @@ void Async_I2C_callback(I2C_Handle handle, I2C_Transaction *transaction, bool tr
     }
 
 
-    xSemaphoreGiveFromISR(async_handle->i2c_lock, NULL);
+    xSemaphoreGiveFromISR(async_handle->i2c_lock, &xHigherPriorityTaskWoken);
+
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 

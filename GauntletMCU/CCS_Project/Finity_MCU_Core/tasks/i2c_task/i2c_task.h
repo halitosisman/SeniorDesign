@@ -12,6 +12,7 @@
 #define I2C_MAX_BLOCK_TIME_MS 500
 #define ADC_TIMER_ID 0
 
+#include <ti/drivers/GPIO.h>
 #include "tasks/FGtask.h"
 #include "drivers/ADC/ADC7993.h"
 #include "stdio.h"
@@ -51,7 +52,7 @@ extern QueueHandle_t i2c_event_box; // because there's no other way for sl_event
 */
 void i2c_task(void * par);
 
-void gui_update(GUI_Letter state, QueueHandle_t * mailroom);
+void gui_update(TaskHandle_t gui_task);
 
 #ifdef __cplusplus
 }

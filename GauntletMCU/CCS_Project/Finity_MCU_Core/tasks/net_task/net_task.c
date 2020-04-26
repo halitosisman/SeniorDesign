@@ -1024,7 +1024,7 @@ void * MqttClient(void *pvParameters)
             return(NULL);
 
         case USR_CMD:
-            // TODO Hook in my I2C functionality here
+            publish_command(FG_user_state.selected_device, FG_user_state.selected_command);
             break;
 
         default:
@@ -1124,7 +1124,7 @@ void Mqtt_start()
 
     /*Set priority and stack size attributes                                 */
     pthread_attr_init(&pAttrs);
-    priParam.sched_priority = 2;
+    priParam.sched_priority = NET_TASK_PRIORITY;
     retc = pthread_attr_setschedparam(&pAttrs, &priParam);
     retc |= pthread_attr_setstacksize(&pAttrs, MQTTTHREADSIZE);
     retc |= pthread_attr_setdetachstate(&pAttrs, PTHREAD_CREATE_DETACHED);

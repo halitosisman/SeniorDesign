@@ -24,6 +24,8 @@
 #define SL_TASK_STACK_SIZE 2048 // copied from TI's tcpecho example
 #define SPAWN_TASK_PRIORITY 9 // also copied from TI's tcpecho example
 
+#define BACKGROUND_UPDATE_PERIOD_MS 5000
+
 
 #ifndef TASKS_LCD_TASK_LCD_TASK_H_
 #define TASKS_LCD_TASK_LCD_TASK_H_

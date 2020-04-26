@@ -25,7 +25,6 @@ State_Tracker::~State_Tracker()
 }
 
 void State_Tracker::init() {
-
 }
 
 void State_Tracker::update(int num, ...)
