@@ -72,7 +72,7 @@ int main(void)
     i2c_arg.usStackDepth = I2C_THREAD_STACK_SIZE;
     i2c_arg.uxPriority = I2C_THREAD_PRIORITY;
     FGcreate_task(i2c_arg);
-/*
+
     net_arg.pcName = static_cast<char *>("net");
     net_arg.pvParameters = &thread_args;
     net_arg.pvTaskCode = NULL;
@@ -80,7 +80,7 @@ int main(void)
     net_arg.usStackDepth = NET_TASK_STACK_SIZE;
     net_arg.uxPriority = NET_TASK_SPAWNER_PRIORITY;
     FGcreate_task(net_arg);
-*/
+
     gui_arg.pcName = static_cast<char *>("gui");
     gui_arg.pvParameters = &thread_args;
     gui_arg.pvTaskCode = gui_task;

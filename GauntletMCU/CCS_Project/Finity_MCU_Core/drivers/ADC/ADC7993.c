@@ -119,7 +119,9 @@ Async_I2C_Handle * AD7993_init(AD7993_Config * AD7993_config) {
 
     int8_t counter = 0;
     while (counter < 2 + 3 * ADC7993_CH_CNT) {
-        if (Async_I2C_process(AD7993) != NULL) {
+        Async_I2C_process(AD7993);
+        if (Async_I2C_dequeue(AD7993) != NULL) {
+            Async_I2C_process(AD7993);
             counter++;
         }
     }
@@ -134,7 +136,8 @@ I2C_Transaction * AD7993_read_config(Async_I2C_Handle * AD7993_Handle, uint8_t a
     ((uint8_t *)(read_conf.writeBuf))[0] = addr;
     Async_I2C_enqueue(AD7993_Handle, &read_conf);
     while (result == NULL) {
-        result = Async_I2C_process(AD7993_Handle);
+        Async_I2C_process(AD7993_Handle);
+        result = Async_I2C_dequeue(AD7993_Handle);
     }
     return result;
 }
@@ -144,7 +147,8 @@ I2C_Transaction * AD7993_read_conv(Async_I2C_Handle * AD7993_Handle) {
 
     Async_I2C_enqueue(AD7993_Handle, &read_conv);
     while (result == NULL) {
-        result = Async_I2C_process(AD7993_Handle);
+        Async_I2C_process(AD7993_Handle);
+        result = Async_I2C_dequeue(AD7993_Handle);
     }
     return result;
 }
@@ -152,13 +156,15 @@ I2C_Transaction * AD7993_read_conv(Async_I2C_Handle * AD7993_Handle) {
 void AD7993_start_read(Async_I2C_Handle* AD7993_Handle)
 {
     Async_I2C_enqueue(AD7993_Handle, &read_conv);
+    Async_I2C_process(AD7993_Handle);
 }
 
 I2C_Transaction* AD7993_end_read(Async_I2C_Handle* AD7993_Handle)
 {
-    I2C_Transaction * result = Async_I2C_process(AD7993_Handle);
+    I2C_Transaction * result = Async_I2C_dequeue(AD7993_Handle);
     while (result == NULL) {
-        result = Async_I2C_process(AD7993_Handle);
+        Async_I2C_process(AD7993_Handle);
+        result = Async_I2C_dequeue(AD7993_Handle);
     }
     return result;
 }
@@ -174,7 +180,8 @@ I2C_Transaction* AD7993_get_config(Async_I2C_Handle* AD7993_Handle)
 
     Async_I2C_enqueue(AD7993_Handle, &read_conf);
     while (result == NULL) {
-        result = Async_I2C_process(AD7993_Handle);
+        Async_I2C_process(AD7993_Handle);
+        result = Async_I2C_dequeue(AD7993_Handle);
     }
     return result;
 }
@@ -185,7 +192,8 @@ I2C_Transaction* AD7993_reset_alert(Async_I2C_Handle* AD7993_Handle)
 
     Async_I2C_enqueue(AD7993_Handle, &reset_alrt);
     while (result == NULL) {
-        result = Async_I2C_process(AD7993_Handle);
+        Async_I2C_process(AD7993_Handle);
+        result = Async_I2C_dequeue(AD7993_Handle);
     }
     return result;
 }

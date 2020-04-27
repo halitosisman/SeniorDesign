@@ -24,6 +24,7 @@ public:
 protected:
     virtual Cord2D transform_cord(int32_t x, int32_t y);
     virtual void drawString(int8_t *string, int32_t lLength, int32_t x, int32_t y, bool opaque);
+    virtual void drawPixel(int32_t x, int32_t y, int32_t color);
 
 private:
     Graphics_Context * context;

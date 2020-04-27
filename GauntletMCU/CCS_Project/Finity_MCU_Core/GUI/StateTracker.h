@@ -16,11 +16,13 @@ class State_Tracker : public Window
 public:
     State_Tracker();
     virtual ~State_Tracker();
-    virtual void update(int num, ...);
+    virtual void update(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3);
     virtual void init();
 private:
     Cord2D locs[3];
     Cord2D s_size;
+    uint8_t s_count;
+    Graphics_Rectangle s_bbox[3];
 };
 
 #endif /* GUI_STATETRACKER_H_ */

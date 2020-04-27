@@ -37,7 +37,8 @@ typedef struct _Async_I2C_Handle {
 
 Async_I2C_Handle * Async_I2C_open(I2C_BitRate bitRate, uint32_t timeout);
 bool Async_I2C_enqueue(Async_I2C_Handle * handle, I2C_Transaction *transaction);
-I2C_Transaction * Async_I2C_process(Async_I2C_Handle* handle);
+void Async_I2C_process(Async_I2C_Handle* handle);
+I2C_Transaction * Async_I2C_dequeue(Async_I2C_Handle* handle);
 void Async_I2C_close(Async_I2C_Handle * handle);
 
 

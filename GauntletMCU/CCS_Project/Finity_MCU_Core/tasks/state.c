@@ -48,7 +48,7 @@ void init_FG_state()
 
 // Note that the concept of direction here is relative to the state enum as viewed in the next editor, where upwards
 // corresponds to lower indices
-static bool device_null_callback(Nav event) {
+static bool device_null_callback(uint8_t event) {
     switch (event) {
     case Nav_Up:
         if (FG_user_state.device_type == Device_Null + 1) {
@@ -68,19 +68,44 @@ static bool device_null_callback(Nav event) {
         present_callback = state_callbacks[FG_user_state.device_type];
         switch (FG_user_state.device_type) {
         case Device_Light:
-            FG_user_state.selected_device = (struct Device *)(device_list.Light);
+            if (device_list.Light != NULL) {
+                FG_user_state.selected_device = (struct Device *)(device_list.Light);
+            }
+            else {
+                present_callback = state_callbacks[Device_Null];
+            }
             return false;
         case Device_Motor:
-            FG_user_state.selected_device = (struct Device *)(device_list.Motor);
+            if (device_list.Motor != NULL) {
+                FG_user_state.selected_device = (struct Device *)(device_list.Motor);
+            }
+            else {
+                present_callback = state_callbacks[Device_Null];
+            }
             return false;
         case Device_Accel:
-            FG_user_state.selected_device = (struct Device *)(device_list.Accel);
+            if (device_list.Accel != NULL) {
+                FG_user_state.selected_device = (struct Device *)(device_list.Accel);
+            }
+            else {
+                present_callback = state_callbacks[Device_Null];
+            }
             return false;
         case Device_Temp:
-            FG_user_state.selected_device = (struct Device *)(device_list.Temp);
+            if (device_list.Temp != NULL) {
+                FG_user_state.selected_device = (struct Device *)(device_list.Temp);
+            }
+            else {
+                present_callback = state_callbacks[Device_Null];
+            }
             return false;
         case Device_System:
-            FG_user_state.selected_command = command_list.S;
+            if (command_list.S != NULL) {
+                FG_user_state.selected_command = command_list.S;
+            }
+            else {
+                present_callback = state_callbacks[Device_Null];
+            }
             return false;
         default:
             ERR_PRINT(LOGIC_ERROR);

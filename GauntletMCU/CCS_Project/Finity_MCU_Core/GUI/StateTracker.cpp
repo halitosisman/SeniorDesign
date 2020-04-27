@@ -15,8 +15,15 @@ State_Tracker::State_Tracker() : Window(&g_sContext, log_loc)
     this->locs[0] = {10, 10};
     this->locs[1] = {10, 50};
     this->locs[2] = {10, 90};
-    this->s_size.x = 50;
+    this->s_size.x = 80;
     this->s_size.y = 30;
+    this->s_count = 3;
+    for (int i = 0; i < 3; i++) { //access all the arguments assigned to valist
+        this->s_bbox[i].xMax = this->locs[i].x + this->s_size.x;
+        this->s_bbox[i].xMin = this->locs[i].x;
+        this->s_bbox[i].yMax = this->locs[i].y + this->s_size.y;
+        this->s_bbox[i].yMin = this->locs[i].y;
+    }
 }
 
 State_Tracker::~State_Tracker()
@@ -27,22 +34,14 @@ State_Tracker::~State_Tracker()
 void State_Tracker::init() {
 }
 
-void State_Tracker::update(int num, ...)
+void State_Tracker::update(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3)
 {
     Cord2S loc = this->getloc();
-    Graphics_Rectangle clr_region;
-    va_list valist;
-    va_start(valist, num);
-    int8_t * state;
-    for (int i = 0; i < num; i += 2) { //access all the arguments assigned to valist
-        clr_region.xMax = this->locs[i / 2].x + this->s_size.x;
-        clr_region.xMin = this->locs[i / 2].x;
-        clr_region.yMax = this->locs[i / 2].y + this->s_size.y;
-        clr_region.yMin = this->locs[i / 2].y;
-        this->clr_region(clr_region);
-        state = va_arg(valist, int8_t*);
-        Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
-        this->drawString(state, va_arg(valist, int), this->locs[i / 2].x, this->locs[i / 2].y, true);
+    for(uint8_t i = 0; i < 3; i++) {
+        this->clr_region(this->s_bbox[i]);
     }
-    va_end(valist);
+    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
+    this->drawString(s1, c1, this->locs[0].x, this->locs[0].y, true);
+    this->drawString(s2, c2, this->locs[1].x, this->locs[1].y, true);
+    this->drawString(s3, c3, this->locs[2].x, this->locs[2].y, true);
 }

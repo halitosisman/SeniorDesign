@@ -65,7 +65,7 @@ typedef enum CC3220SF_LAUNCHXL_SPIName {
     CC3220SF_LAUNCHXL_SPICOUNT
 } CC3220SF_LAUNCHXL_SPIName;
 
-typedef enum GPIO_Settings {
+typedef enum {
     GPIO_RDX = 0,
     GPIO_WRX,
     GPIO_DCX,
@@ -79,7 +79,7 @@ typedef enum GPIO_Settings {
     GPIO_D0,
     GPIO_I2C_Int,
     GPIO_Pin_Count
-};
+} GPIO_Settings;
 
 void i2c_int_callback(uint_least8_t index);
 

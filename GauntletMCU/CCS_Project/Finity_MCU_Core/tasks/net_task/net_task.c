@@ -684,6 +684,9 @@ void * MqttClient(void *pvParameters)
     long lRetVal = -1;
     char *tmpBuff;
 
+    // Init Command Lists
+    init_command_list();
+
     /*Initializing Client and Subscribing to the Broker.                     */
     if(gApConnectionState >= 0)
     {
@@ -764,9 +767,6 @@ void * MqttClient(void *pvParameters)
                         //Update connected devices
                         update_devices();
                         break;
-                    case 1:
-                        // Init Command Lists
-                        init_command_list();
                     }
 
                 }
@@ -1219,7 +1219,7 @@ int32_t MqttClient_start()
     /*Open Client Receive Thread start the receive task. Set priority and    */
     /*stack size attributes                                                  */
     pthread_attr_init(&pAttrs);
-    priParam.sched_priority = 2;
+    priParam.sched_priority = NET_TASK_MQTT_CLIENT_PRIORITY;
     lRetVal = pthread_attr_setschedparam(&pAttrs, &priParam);
     lRetVal |= pthread_attr_setstacksize(&pAttrs, RXTASKSIZE);
     lRetVal |= pthread_attr_setdetachstate(&pAttrs, PTHREAD_CREATE_DETACHED);

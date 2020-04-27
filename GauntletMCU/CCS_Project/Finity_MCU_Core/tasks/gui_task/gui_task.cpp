@@ -22,7 +22,7 @@ int32_t fatfs_getFatTime(void) {
 
 static bool gui_get_update()
 {
-    if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(BACKGROUND_UPDATE_PERIOD_MS))) {
+    if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(portMAX_DELAY))) {
         return true;
     }
     else {
@@ -36,15 +36,12 @@ struct Command empty =
  .name_len = sizeof(" ")
 };
 void gui_task(void * par) {
-    bool cmd_issued = false;
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
 
-    taskENTER_CRITICAL();
     FG_GUI_init();
     logger.init();
     state_tracker.init();
-    taskEXIT_CRITICAL();
     while (1) {
         struct Command default_command[3] =
         {
@@ -52,76 +49,79 @@ void gui_task(void * par) {
          empty,
          empty
         };
-        cmd_issued = gui_get_update();
-        if (cmd_issued) {
-            // ignore for now
-        }
-        else {
-            struct Command * cmd[3] =
-            {
-             &(default_command[0]),
-             &(default_command[1]),
-             &(default_command[2])
-            };
+        gui_get_update();
+        struct Command * cmd[3] =
+        {
+         &(default_command[0]),
+         &(default_command[1]),
+         &(default_command[2])
+        };
 
-            // User is not in the command selection screen
-            if (FG_user_state.selected_command != NULL) {
-                if (FG_user_state.selected_command->next != NULL) {
-                    cmd[0] = FG_user_state.selected_command->next;
-                }
-                if (FG_user_state.selected_command->prev != NULL) {
-                    cmd[2] = FG_user_state.selected_command->prev;
-                }
-                cmd[1] = FG_user_state.selected_command;
+        // User is not in the command selection screen
+        if (FG_user_state.selected_command != NULL) {
+            if (FG_user_state.selected_command->next != NULL) {
+                cmd[0] = FG_user_state.selected_command->next;
             }
-            // User is not in the device selection screen
-            else if (FG_user_state.selected_device != NULL) {
-                if (FG_user_state.selected_device->next != NULL) {
-                    cmd[0] = (Command *) FG_user_state.selected_device->next;
-                }
-                if (FG_user_state.selected_device->prev != NULL) {
-                    cmd[2] = (Command *) FG_user_state.selected_device->prev;
-                }
-                cmd[1] = (Command *) FG_user_state.selected_device;
+            if (FG_user_state.selected_command->prev != NULL) {
+                cmd[2] = FG_user_state.selected_command->prev;
             }
-            // Therefore the user must be in the device type selection screen!
-            else {
-                switch (FG_user_state.device_type) {
-                case Device_Light:
-                    strcpy(cmd[1]->name, "Light");
-                    cmd[1]->name_len = sizeof("Light");
-                    strcpy(cmd[2]->name, "Motor");
-                    cmd[2]->name_len = sizeof("Motor");
-                    break;
-                case Device_Motor:
-                    strcpy(cmd[0]->name, "Light");
-                    cmd[0]->name_len = sizeof("Light");
-                    strcpy(cmd[1]->name, "Motor");
-                    cmd[1]->name_len = sizeof("Motor");
-                    strcpy(cmd[2]->name, "Accel");
-                    cmd[2]->name_len = sizeof("Accel");
-                    break;
-                case Device_Accel:
-                    strcpy(cmd[0]->name, "Motor");
-                    cmd[0]->name_len = sizeof("Motor");
-                    strcpy(cmd[1]->name, "Accel");
-                    cmd[1]->name_len = sizeof("Accel");
-                    strcpy(cmd[2]->name, "Temp");
-                    cmd[2]->name_len = sizeof("Temp");
-                    break;
-                case Device_Temp:
-                    strcpy(cmd[0]->name, "Accel");
-                    cmd[0]->name_len = sizeof("Accel");
-                    strcpy(cmd[1]->name, "Temp");
-                    cmd[1]->name_len = sizeof("Temp");
-                    break;
-                }
-            }
-            taskENTER_CRITICAL();
-            state_tracker.update(6, cmd[0]->name, cmd[0]->name_len, cmd[1]->name, cmd[1]->name_len, cmd[2]->name,
-                                 cmd[2]->name_len);
-            taskEXIT_CRITICAL();
+            cmd[1] = FG_user_state.selected_command;
         }
+        // User is not in the device selection screen
+        else if (FG_user_state.selected_device != NULL) {
+            if (FG_user_state.selected_device->next != NULL) {
+                cmd[0] = (Command *) FG_user_state.selected_device->next;
+            }
+            if (FG_user_state.selected_device->prev != NULL) {
+                cmd[2] = (Command *) FG_user_state.selected_device->prev;
+            }
+            cmd[1] = (Command *) FG_user_state.selected_device;
+        }
+        // Therefore the user must be in the device type selection screen!
+        else {
+            switch (FG_user_state.device_type) {
+            case Device_Light:
+                strcpy(cmd[1]->name, "Light");
+                cmd[1]->name_len = sizeof("Light");
+                strcpy(cmd[2]->name, "Motor");
+                cmd[2]->name_len = sizeof("Motor");
+                break;
+            case Device_Motor:
+                strcpy(cmd[0]->name, "Light");
+                cmd[0]->name_len = sizeof("Light");
+                strcpy(cmd[1]->name, "Motor");
+                cmd[1]->name_len = sizeof("Motor");
+                strcpy(cmd[2]->name, "Accel");
+                cmd[2]->name_len = sizeof("Accel");
+                break;
+            case Device_Accel:
+                strcpy(cmd[0]->name, "Motor");
+                cmd[0]->name_len = sizeof("Motor");
+                strcpy(cmd[1]->name, "Accel");
+                cmd[1]->name_len = sizeof("Accel");
+                strcpy(cmd[2]->name, "Temp");
+                cmd[2]->name_len = sizeof("Temp");
+                break;
+            case Device_Temp:
+                strcpy(cmd[0]->name, "Accel");
+                cmd[0]->name_len = sizeof("Accel");
+                strcpy(cmd[1]->name, "Temp");
+                cmd[1]->name_len = sizeof("Temp");
+                strcpy(cmd[2]->name, "System");
+                cmd[2]->name_len = sizeof("System");
+                break;
+            case Device_System:
+                cmd[0]->name_len = sizeof("Temp");
+                strcpy(cmd[0]->name, "Temp");
+                cmd[1]->name_len = sizeof("System");
+                strcpy(cmd[1]->name, "System");
+                break;
+            }
+        }
+
+        state_tracker.update((int8_t *)(cmd[0]->name), cmd[0]->name_len - 1,
+                             (int8_t *)(cmd[1]->name), cmd[1]->name_len - 1,
+                             (int8_t *)(cmd[2]->name), cmd[2]->name_len - 1);
     }
 
 }

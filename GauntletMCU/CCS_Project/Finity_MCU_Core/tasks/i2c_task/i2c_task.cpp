@@ -35,10 +35,9 @@ void adc_timer_callback(TimerHandle_t xTimer) {
 void i2c_task(void * par) {
     i2c_task_handle = ((FGthread_arg_t *) par)->tasks[I2C_THREAD_ID];
     gui_task_handle = ((FGthread_arg_t *) par)->tasks[GUI_THREAD_ID];
-    GUI_Letter gui_letter;
     uint32_t notify_flags = 0;
-    TimerHandle_t adc_delayer = xTimerCreate("adc_delayer", pdMS_TO_TICKS(50), pdFALSE, ADC_TIMER_ID,
-                                             adc_timer_callback);
+    TimerHandle_t adc_delayer = xTimerCreate("adc_delayer", pdMS_TO_TICKS(I2C_THREAD_BUTTON_DELAY_MS),
+                                             pdFALSE, ADC_TIMER_ID, adc_timer_callback);
 
     AD7993_Config FG_AD7993_Handle = // TODO Move to task files
     {
@@ -67,7 +66,7 @@ void i2c_task(void * par) {
     GPIO_setCallback(GPIO_I2C_Int, i2c_int_callback);
     GPIO_enableInt(GPIO_I2C_Int);
 
-    //adc_read = AD7993_read_conv(AD7993);
+    // For debugging
     adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
     adc_read = AD7993_read_config(AD7993, AD7993_CONF_ADDR);
     adc_read = AD7993_read_config(AD7993, AD7993_CYCLE_TIMER_ADDR);
@@ -92,7 +91,7 @@ void i2c_task(void * par) {
     gui_update(static_cast<FGthread_arg_t *>(par)->tasks[GUI_THREAD_ID]);
 
     while(1) {
-        notify_flags = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(I2C_THREAD_POLL_PERIOD_MS));
+        notify_flags = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(portMAX_DELAY));
 
         if (notify_flags & I2C_THREAD_ADC_TIMER_FLAG) { // If the delay timer for the ADC has finished
             AD7993_start_read(AD7993);
@@ -103,8 +102,6 @@ void i2c_task(void * par) {
         }
 
         // Insert other I2C checks here if we decide to add them
-
-        vTaskDelay(pdMS_TO_TICKS(1)); // Wait for I2C transactions to finish
 
         struct msgQueue netMsg;
         uint16_t r = 0;
@@ -118,12 +115,10 @@ void i2c_task(void * par) {
             for (uint8_t i = 0; i < ADC7993_CH_CNT * 2; i += 2) {
                 r = AD7993_convert_result(static_cast<uint8_t *>(adc_read->readBuf)[i],
                                           static_cast<uint8_t *>(adc_read->readBuf)[i + 1]);
-                if (r > I2C_THREAD_ADC_THRESH) {
+                if (r < I2C_THREAD_ADC_THRESH) {
                     if (update_FG_state(static_cast<Nav>(i / 2))) { // Update the top level state machine.
-                        gui_letter.cmd_issued = true;
                     }
                     else {
-                        gui_letter.cmd_issued = false;
                     }
                     // Signal the MQTT thread
                     netMsg.event = USR_CMD;
@@ -131,9 +126,9 @@ void i2c_task(void * par) {
                     netMsg.topLen = 0;
                     mq_send(g_PBQueue, (char *) &netMsg, sizeof(netMsg), 0);
 
-                    gui_letter.state = FG_user_state;
                     vTaskDelay(pdMS_TO_TICKS(10)); // Wait for the networking thread to update
                     gui_update(static_cast<FGthread_arg_t *>(par)->tasks[GUI_THREAD_ID]);
+                    break;
                 }
             }
         }

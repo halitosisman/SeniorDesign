@@ -79,11 +79,10 @@ bool Async_I2C_enqueue(Async_I2C_Handle* handle, I2C_Transaction* transaction)
 }
 
 
-I2C_Transaction* Async_I2C_process(Async_I2C_Handle* handle)
+void Async_I2C_process(Async_I2C_Handle* handle)
 {
     int_fast16_t i2c_status;
     I2C_Transaction * pending[1];
-    I2C_Transaction * completed[1];
 
     // If I2C transactions are pending, the I2C callback releases this lock. Otherwise, the lock is immediately
     // relinquished.
@@ -105,6 +104,11 @@ I2C_Transaction* Async_I2C_process(Async_I2C_Handle* handle)
         }
 
     }
+}
+
+I2C_Transaction* Async_I2C_dequeue(Async_I2C_Handle* handle)
+{
+    I2C_Transaction * completed[1];
 
     if (xQueueReceive(handle->completed, completed, pdMS_TO_TICKS(TRANSACTION_DEQUEUE_MAX_TIME_MS)) == pdPASS) {
         return *completed;
