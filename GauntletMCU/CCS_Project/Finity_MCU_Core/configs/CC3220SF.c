@@ -277,7 +277,7 @@ GPIO_PinConfig gpioPinConfigs[] =
      GPIOCC32XX_GPIO_10 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
      GPIOCC32XX_GPIO_11 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
      // I2C_INT
-     GPIOCC32XX_GPIO_22 | GPIO_CFG_IN_PU
+     GPIOCC32XX_GPIO_28 | GPIO_DO_NOT_CONFIG
 };
 
 /*
@@ -306,7 +306,7 @@ GPIO_CallbackFxn gpioCallbackFunctions[GPIO_Pin_Count] =
      NULL,
      NULL,
      //I2C_INT
-     i2c_int_callback
+     NULL
 };
 
 /*

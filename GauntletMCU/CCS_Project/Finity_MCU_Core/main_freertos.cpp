@@ -48,13 +48,12 @@
 #include "configs/Board.h"
 #include "configs/thread_config.h"
 
-FGthread_arg_t thread_args;
-
 /*
  *  ======== main ========
  */
 int main(void)
 {
+    FGthread_arg_t thread_args;
     T_Params net_arg;
     T_Params i2c_arg;
     T_Params gui_arg;

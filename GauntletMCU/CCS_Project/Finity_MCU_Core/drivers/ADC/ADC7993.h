@@ -38,6 +38,7 @@
 #define AD7993_CONF_BUSY_ALERT_ACTIVE_LOW_MSK 0b0
 
 #define AD7993_CYCLE_TIMER_OFF 0
+#define AD7993_CYCLE_TIMER_T256 0b100
 
 #define AD7993_CONF_SIZE 2 // TODO dunno quite how big to make this yet
 #define AD7993_CONV_READ_SIZE 8
@@ -46,10 +47,10 @@
 
 #define FINITY_GAUNTLET_AD7993_CONF (AD7993_CONF_CH4_MSK | AD7993_CONF_CH3_MSK | AD7993_CONF_CH2_MSK | \
                                         AD7993_CONF_CH1_MSK | AD7993_CONF_FLTR_MSK |  AD7993_CONF_ALERT_MSK | \
-                                        AD7993_CONF_BUSY_ALERT_ACTIVE_LOW_MSK)
-#define FINITY_GAUNTLET_AD7993_HYSTERESIS 8 // units of LSB
-#define FINITY_GAUNTLET_AD7993_DATA_HIGH 0xE8A // about 3V
-#define FINITY_GAUNTLET_AD7993_DATA_LOW 0x0 // about 0.3V
+                                        AD7993_CONF_BUSY_ALERT_ACTIVE_LOW_MSK | AD7993_CONF_ALERT_RESET_MSK)
+#define FINITY_GAUNTLET_AD7993_HYSTERESIS 4 // units of LSB
+#define FINITY_GAUNTLET_AD7993_DATA_HIGH 0xFFC // about 3V
+#define FINITY_GAUNTLET_AD7993_DATA_LOW 0x744 // about 0.3V
 #define FINITY_GAUNTLET_AD7993_I2C_TIMEOUT_TICKS 10000000
 
 
@@ -70,7 +71,10 @@ typedef struct _AD7993_Config {
 extern void AD7993_i2c_callback(I2C_Handle handle, I2C_Transaction *transaction, bool transferStatus);
 
 Async_I2C_Handle * AD7993_init(AD7993_Config * AD7993_config);
-I2C_Transaction * AD7993_read_blocking(Async_I2C_Handle * AD7993_Handle);
+I2C_Transaction * AD7993_read_config(Async_I2C_Handle * AD7993_Handle, uint8_t addr);
+I2C_Transaction * AD7993_get_config(Async_I2C_Handle * AD7993_Handle);
+I2C_Transaction * AD7993_read_conv(Async_I2C_Handle * AD7993_Handle);
+I2C_Transaction * AD7993_reset_alert(Async_I2C_Handle * AD7993_Handle);
 void AD7993_start_read(Async_I2C_Handle * AD7993_Handle);
 I2C_Transaction * AD7993_end_read(Async_I2C_Handle * AD7993_Handle);
 uint16_t AD7993_convert_result(uint32_t MSB, uint32_t LSB);

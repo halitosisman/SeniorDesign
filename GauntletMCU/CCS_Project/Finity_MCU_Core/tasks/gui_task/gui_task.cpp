@@ -46,15 +46,23 @@ void gui_task(void * par) {
     state_tracker.init();
     taskEXIT_CRITICAL();
     while (1) {
+        struct Command default_command[3] =
+        {
+         empty,
+         empty,
+         empty
+        };
         cmd_issued = gui_get_update();
         if (cmd_issued) {
             // ignore for now
         }
         else {
-            struct Command * cmd[3];
-            // If at the edge of a selection, fill the top or bottom entry with a blank
-            cmd[0] = &empty;
-            cmd[2] = &empty;
+            struct Command * cmd[3] =
+            {
+             &(default_command[0]),
+             &(default_command[1]),
+             &(default_command[2])
+            };
 
             // User is not in the command selection screen
             if (FG_user_state.selected_command != NULL) {

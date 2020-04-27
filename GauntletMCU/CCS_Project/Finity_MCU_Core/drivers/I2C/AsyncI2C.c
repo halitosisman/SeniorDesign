@@ -20,7 +20,7 @@ void Async_I2C_callback(I2C_Handle handle, I2C_Transaction *transaction, bool tr
 
     // Add completed I2C transaction to queue for processing
     Async_I2C_Handle * async_handle = (Async_I2C_Handle *) transaction->arg;
-    if (xQueueSendToBackFromISR(async_handle->completed, transaction, NULL) == errQUEUE_FULL) {
+    if (xQueueSendToBackFromISR(async_handle->completed, &transaction, NULL) == errQUEUE_FULL) {
         while (1) { // this wasn't supposed to happen
 
         }
@@ -106,7 +106,7 @@ I2C_Transaction* Async_I2C_process(Async_I2C_Handle* handle)
 
     }
 
-    if (xQueueReceive(handle->completed, *completed, pdMS_TO_TICKS(TRANSACTION_DEQUEUE_MAX_TIME_MS)) == pdPASS) {
+    if (xQueueReceive(handle->completed, completed, pdMS_TO_TICKS(TRANSACTION_DEQUEUE_MAX_TIME_MS)) == pdPASS) {
         return *completed;
     }
     else{

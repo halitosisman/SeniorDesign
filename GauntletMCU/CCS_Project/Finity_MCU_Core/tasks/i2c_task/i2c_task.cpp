@@ -14,6 +14,7 @@ static TaskHandle_t i2c_task_handle;
 static TaskHandle_t gui_task_handle;
 
 void i2c_int_callback(uint_least8_t index) {
+    int test = GPIO_read(GPIO_I2C_Int);
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     xTaskNotifyFromISR(i2c_task_handle, I2C_THREAD_I2C_INT_FLAG, eSetBits, &xHigherPriorityTaskWoken);
@@ -42,15 +43,15 @@ void i2c_task(void * par) {
     AD7993_Config FG_AD7993_Handle = // TODO Move to task files
     {
      .config = FINITY_GAUNTLET_AD7993_CONF,
-     .cycle_timer = AD7993_CYCLE_TIMER_OFF,
-     .data_high[0] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
-     .data_high[1] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
-     .data_high[2] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
-     .data_high[3] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
-     .data_low[0] = FINITY_GAUNTLET_AD7993_DATA_LOW,
-     .data_low[1] = FINITY_GAUNTLET_AD7993_DATA_LOW,
-     .data_low[2] = FINITY_GAUNTLET_AD7993_DATA_LOW,
-     .data_low[3] = FINITY_GAUNTLET_AD7993_DATA_LOW,
+     .cycle_timer = AD7993_CYCLE_TIMER_T256,
+     .data_high[0] = 0xFFC,
+     .data_high[1] = 0xFFC,
+     .data_high[2] = 0xFFC,
+     .data_high[3] = 0xFFC,
+     .data_low[0] = 1860,
+     .data_low[1] = 1860,
+     .data_low[2] = 1860,
+     .data_low[3] = 1860,
      .hysteresis[0] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
      .hysteresis[1] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
      .hysteresis[2] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
@@ -60,7 +61,32 @@ void i2c_task(void * par) {
     bool adc_read_active = false;
     Async_I2C_Handle * AD7993 = AD7993_init(&FG_AD7993_Handle);
     I2C_Transaction * adc_read;
+    GPIO_disableInt(GPIO_I2C_Int);
+    GPIO_clearInt(GPIO_I2C_Int);
+    GPIO_setConfig(GPIO_I2C_Int, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
+    GPIO_setCallback(GPIO_I2C_Int, i2c_int_callback);
     GPIO_enableInt(GPIO_I2C_Int);
+
+    //adc_read = AD7993_read_conv(AD7993);
+    adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
+    adc_read = AD7993_read_config(AD7993, AD7993_CONF_ADDR);
+    adc_read = AD7993_read_config(AD7993, AD7993_CYCLE_TIMER_ADDR);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 1);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 2);
+
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 3);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 4);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 5);
+
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 6);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 7);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 8);
+
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 9);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 10);
+    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 11);
+    adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
 
     init_FG_state();
     gui_update(static_cast<FGthread_arg_t *>(par)->tasks[GUI_THREAD_ID]);
@@ -116,6 +142,6 @@ void i2c_task(void * par) {
 
 
 void gui_update(TaskHandle_t gui_task) {
-    xTaskNotify(gui_task, GUI_UPDATE_SIG, eSetBits);
+    xTaskNotify(gui_task_handle, GUI_UPDATE_SIG, eSetBits);
 }
 
