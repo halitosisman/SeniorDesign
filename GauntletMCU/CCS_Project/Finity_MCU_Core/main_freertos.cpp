@@ -37,9 +37,13 @@
 
 #include "string.h"
 
+/* POSIX Header files */
+#include <pthread.h>
+
 /* RTOS header files */
 #include <tasks/gui_task/gui_task.h>
 #include <tasks/i2c_task/i2c_task.h>
+#include <tasks/net_task/net_task.h>
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -48,15 +52,21 @@
 #include "configs/Board.h"
 #include "configs/thread_config.h"
 
+pthread_t thread;
 /*
  *  ======== main ========
  */
 int main(void)
 {
     FGthread_arg_t thread_args;
-    T_Params net_arg;
+    // T_Params net_arg;
     T_Params i2c_arg;
     T_Params gui_arg;
+
+    pthread_attr_t pAttrs;
+    struct sched_param priParam;
+    int retc;
+    int detachState;
 
     /* Call driver init functions */
     Board_init();
@@ -73,20 +83,57 @@ int main(void)
     i2c_arg.uxPriority = I2C_THREAD_PRIORITY;
     FGcreate_task(i2c_arg);
 
+    /* Set priority and stack size attributes */
+    pthread_attr_init(&pAttrs);
+    priParam.sched_priority = NET_TASK_SPAWNER_PRIORITY; // 1
+
+    detachState = PTHREAD_CREATE_DETACHED;
+    retc = pthread_attr_setdetachstate(&pAttrs, detachState);
+    if(retc != 0)
+    {
+        /* pthread_attr_setdetachstate() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    pthread_attr_setschedparam(&pAttrs, &priParam);
+
+    retc |= pthread_attr_setstacksize(&pAttrs, 4096);
+    if(retc != 0)
+    {
+        /* pthread_attr_setstacksize() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    retc = pthread_create(&thread, &pAttrs, (void * (*) (void *))net_task, NULL);
+    if(retc != 0)
+    {
+        /* pthread_create() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+    /*
     net_arg.pcName = static_cast<char *>("net");
     net_arg.pvParameters = &thread_args;
-    net_arg.pvTaskCode = NULL;
+    net_arg.pvTaskCode = net_task;
     net_arg.pxCreatedTask = &(thread_args.tasks[NET_THREAD_ID]);
     net_arg.usStackDepth = NET_TASK_STACK_SIZE;
     net_arg.uxPriority = NET_TASK_SPAWNER_PRIORITY;
     FGcreate_task(net_arg);
-
+*/
     gui_arg.pcName = static_cast<char *>("gui");
     gui_arg.pvParameters = &thread_args;
     gui_arg.pvTaskCode = gui_task;
     gui_arg.pxCreatedTask = &(thread_args.tasks[GUI_THREAD_ID]);
     gui_arg.usStackDepth = GUI_THREAD_STACK_SIZE;
-    gui_arg.uxPriority = 5;//GUI_THREAD_PRIORITY; TEMPORARILY 5 FOR TESTING
+    gui_arg.uxPriority = GUI_THREAD_PRIORITY;
     FGcreate_task(gui_arg);
 
     /* Start the FreeRTOS scheduler */

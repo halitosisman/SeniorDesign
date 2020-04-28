@@ -1124,7 +1124,7 @@ void Mqtt_start()
 
     /*Set priority and stack size attributes                                 */
     pthread_attr_init(&pAttrs);
-    priParam.sched_priority = NET_TASK_PRIORITY;
+    priParam.sched_priority = NET_TASK_PRIORITY; // 2
     retc = pthread_attr_setschedparam(&pAttrs, &priParam);
     retc |= pthread_attr_setstacksize(&pAttrs, MQTTTHREADSIZE);
     retc |= pthread_attr_setdetachstate(&pAttrs, PTHREAD_CREATE_DETACHED);
@@ -1219,7 +1219,7 @@ int32_t MqttClient_start()
     /*Open Client Receive Thread start the receive task. Set priority and    */
     /*stack size attributes                                                  */
     pthread_attr_init(&pAttrs);
-    priParam.sched_priority = NET_TASK_MQTT_CLIENT_PRIORITY;
+    priParam.sched_priority = NET_TASK_MQTT_CLIENT_PRIORITY; // 2
     lRetVal = pthread_attr_setschedparam(&pAttrs, &priParam);
     lRetVal |= pthread_attr_setstacksize(&pAttrs, RXTASKSIZE);
     lRetVal |= pthread_attr_setdetachstate(&pAttrs, PTHREAD_CREATE_DETACHED);
@@ -1573,7 +1573,7 @@ void net_task(void * par) {
     if(retc < 0)
     {
         /*Handle Error */
-        UART_PRINT("mqtt_client - Unable to retrieve device information \n");
+//       UART_PRINT("mqtt_client - Unable to retrieve device information \n");
         while(1)
         {
             ;

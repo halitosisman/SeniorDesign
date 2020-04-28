@@ -46,10 +46,11 @@
 #ifndef TASKS_NET_TASK_NET_TASK_H_
 #define TASKS_NET_TASK_NET_TASK_H_
 
-#ifdef _cplusplus
-#define
+#ifdef __cplusplus
 extern "C" {
 #endif
+
+extern pthread_t thread;
 
 
 //*****************************************************************************
@@ -86,9 +87,8 @@ int32_t MQTT_SendMsgToQueue(struct msgQueue *queueElement);
 void net_task(void * par);
 
 
-#ifdef _cplusplus
-#define
-extern }
+#ifdef __cplusplus
+}
 #endif
 
 

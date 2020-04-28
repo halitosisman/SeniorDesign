@@ -97,6 +97,7 @@
 									<listOptionValue builtIn="false" value="ccs/rtos/simplelink.a"/>
 									<listOptionValue builtIn="false" value="${REF_PROJECT_1_NAME}.lib"/>
 									<listOptionValue builtIn="false" value="ti/devices/cc32xx/driverlib/ccs/Release/driverlib.a"/>
+									<listOptionValue builtIn="false" value="ti\net\mqtt\lib\ccs\m4\mqtt_release.a"/>
 									<listOptionValue builtIn="false" value="libc.a"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.ti.ccstudio.buildDefinitions.TMS470_18.12.linkerID.DIAG_SUPPRESS.1451356645" name="Suppress diagnostic &lt;id&gt; (--diag_suppress)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_18.12.linkerID.DIAG_SUPPRESS" useByScannerDiscovery="false" valueType="stringList">
