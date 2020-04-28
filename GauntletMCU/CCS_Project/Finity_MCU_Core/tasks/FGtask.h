@@ -11,9 +11,9 @@
 
 #include <stdint.h>
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
+#include <pthread.h>
+#include <mqueue.h>
+#include <semaphore.h>
 
 #include "configs/thread_config.h"
 
@@ -36,8 +36,8 @@ typedef struct _GUI_State {
  *
  */
 typedef struct _FGthread_arg {
-    QueueHandle_t mailroom[MAILBOX_CNT];
-    TaskHandle_t tasks[TASK_CNT];
+    mqd_t mailroom[MAILBOX_CNT];
+    pthread_t tasks[TASK_CNT];
 } FGthread_arg_t;
 
 /*!
@@ -65,7 +65,7 @@ typedef struct _T_Params {
     pointer to the function (in effect, just the function name) that implements the
     task.
      */
-    TaskFunction_t pvTaskCode;
+    void * (*pvTaskCode)(void *);
 
     /*
     A descriptive name for the task. This is mainly used to facilitate debugging,
@@ -128,7 +128,7 @@ typedef struct _T_Params {
     the priority assigned to the task being capped silently to the maximum
     legitimate value.
      */
-    UBaseType_t uxPriority;
+    char uxPriority;
 
     /*
     pxCreatedTask can be used to pass out a handle to the task being created.
@@ -138,7 +138,7 @@ typedef struct _T_Params {
     If your application has no use for the task handle, then pxCreatedTask can
     be set to NULL.
      */
-    TaskHandle_t *pxCreatedTask;
+    pthread_t *pxCreatedTask;
 } T_Params;
 
 
@@ -155,7 +155,7 @@ typedef struct _T_Params {
     \note           This function should be used instead of xTaskCreate in the Finity Gauntlet project.
 
 */
-void FGcreate_task(T_Params par);
+//void FGcreate_task(T_Params par);
 
 
 #ifdef __cplusplus

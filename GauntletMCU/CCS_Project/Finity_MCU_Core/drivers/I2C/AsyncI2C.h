@@ -11,8 +11,13 @@
 #include <ti/drivers/I2C.h>
 
 #include "FreeRTOS.h"
-#include "semphr.h"
-#include "queue.h"
+
+#include <stdlib.h>
+
+#include <pthread.h>
+#include <mqueue.h>
+#include <semaphore.h>
+#include <errno.h>
 
 
 #define TRANSACTION_QUEUE_SIZE 20
@@ -29,9 +34,9 @@ typedef struct _Async_I2C_Handle {
     I2C_Params * i2c_params;
     I2C_Handle i2c_handle;
     uint32_t i2c_timeout_ms;
-    SemaphoreHandle_t i2c_lock;
-    QueueHandle_t pending;
-    QueueHandle_t completed;
+    sem_t i2c_lock;
+    mqd_t pending;
+    mqd_t completed;
 } Async_I2C_Handle;
 
 

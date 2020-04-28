@@ -59,10 +59,8 @@ pthread_t thread;
 int main(void)
 {
     FGthread_arg_t thread_args;
-    // T_Params net_arg;
-    T_Params i2c_arg;
-    T_Params gui_arg;
-
+    pthread_t i2c_thread;
+    pthread_t gui_thread;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
     int retc;
@@ -72,16 +70,70 @@ int main(void)
     Board_init();
 
     // Initialize the thread communication data structures
-    thread_args.mailroom[GUI_THREAD_ID] = xQueueCreate(1, sizeof(GUI_Letter));
+    struct mq_attr i2cbox;
+    i2cbox.mq_maxmsg = 1;
+    i2cbox.mq_msgsize = sizeof(char);
+    thread_args.mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
+
+    struct mq_attr guibox;
+    i2cbox.mq_maxmsg = 1;
+    i2cbox.mq_msgsize = sizeof(char);
+    thread_args.mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
+
+    struct mq_attr netbox;
+    i2cbox.mq_maxmsg = 10;
+    i2cbox.mq_msgsize = sizeof(struct msgQueue);
+    thread_args.mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
+
+    //pthread_barrier_init(&(thread_args.sync[I2C_THREAD_ID]), )
 
     // Network Thread Initialization
-    i2c_arg.pcName = static_cast<char *>("i2c");
+   /* i2c_arg.pcName = static_cast<char *>("i2c");
     i2c_arg.pvParameters = &thread_args;
     i2c_arg.pvTaskCode = i2c_task;
     i2c_arg.pxCreatedTask = &(thread_args.tasks[I2C_THREAD_ID]);
     i2c_arg.usStackDepth = I2C_THREAD_STACK_SIZE;
     i2c_arg.uxPriority = I2C_THREAD_PRIORITY;
-    FGcreate_task(i2c_arg);
+    FGcreate_task(i2c_arg);*/
+
+    /* Set priority and stack size attributes */
+    pthread_attr_init(&pAttrs);
+    priParam.sched_priority = I2C_THREAD_PRIORITY; // 1
+
+    detachState = PTHREAD_CREATE_DETACHED;
+    retc = pthread_attr_setdetachstate(&pAttrs, detachState);
+    if(retc != 0)
+    {
+        /* pthread_attr_setdetachstate() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    pthread_attr_setschedparam(&pAttrs, &priParam);
+
+    retc |= pthread_attr_setstacksize(&pAttrs, I2C_THREAD_STACK_SIZE / 4);
+    if(retc != 0)
+    {
+        /* pthread_attr_setstacksize() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    retc = pthread_create(&i2c_thread, &pAttrs, (void * (*) (void *))i2c_task, &thread_args);
+    if(retc != 0)
+    {
+        /* pthread_create() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+
 
     /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);
@@ -127,14 +179,51 @@ int main(void)
     net_arg.usStackDepth = NET_TASK_STACK_SIZE;
     net_arg.uxPriority = NET_TASK_SPAWNER_PRIORITY;
     FGcreate_task(net_arg);
-*/
-    gui_arg.pcName = static_cast<char *>("gui");
+     */
+    /* gui_arg.pcName = static_cast<char *>("gui");
     gui_arg.pvParameters = &thread_args;
     gui_arg.pvTaskCode = gui_task;
     gui_arg.pxCreatedTask = &(thread_args.tasks[GUI_THREAD_ID]);
     gui_arg.usStackDepth = GUI_THREAD_STACK_SIZE;
     gui_arg.uxPriority = GUI_THREAD_PRIORITY;
-    FGcreate_task(gui_arg);
+    FGcreate_task(gui_arg);*/
+
+    /* Set priority and stack size attributes */
+    pthread_attr_init(&pAttrs);
+    priParam.sched_priority = GUI_THREAD_PRIORITY; // 1
+
+    detachState = PTHREAD_CREATE_DETACHED;
+    retc = pthread_attr_setdetachstate(&pAttrs, detachState);
+    if(retc != 0)
+    {
+        /* pthread_attr_setdetachstate() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    pthread_attr_setschedparam(&pAttrs, &priParam);
+
+    retc |= pthread_attr_setstacksize(&pAttrs, GUI_THREAD_STACK_SIZE / 4);
+    if(retc != 0)
+    {
+        /* pthread_attr_setstacksize() failed */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    retc = pthread_create(&gui_thread, &pAttrs, (void * (*) (void *))gui_task, &thread_args);
+    if(retc != 0)
+    {
+        /* pthread_create() failed */
+        while(1)
+        {
+            ;
+        }
+    }
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();

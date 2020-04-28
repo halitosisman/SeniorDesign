@@ -9,7 +9,7 @@
 
 #include <tasks/FGtask.h>
 
-
+/*
 
 void FGcreate_task(T_Params par)
 {
@@ -18,3 +18,4 @@ void FGcreate_task(T_Params par)
 
     // TODO Implement error logging
 }
+*/

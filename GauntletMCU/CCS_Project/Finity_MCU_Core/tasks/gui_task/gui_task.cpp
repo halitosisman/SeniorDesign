@@ -13,7 +13,7 @@
 
 
 
-QueueHandle_t sl_event_box;
+static mqd_t gui_mailroom;
 
 int32_t fatfs_getFatTime(void) {
     return 0;
@@ -22,7 +22,13 @@ int32_t fatfs_getFatTime(void) {
 
 static bool gui_get_update()
 {
-    if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(portMAX_DELAY))) {
+    struct timespec ts;
+
+    clock_gettime(CLOCK_REALTIME, &ts);
+
+    char msg = 0;
+    mq_receive(gui_mailroom, &msg, sizeof(msg), 0);
+    if (msg == 1) {
         return true;
     }
     else {
@@ -36,6 +42,7 @@ struct Command empty =
  .name_len = sizeof(" ")
 };
 void gui_task(void * par) {
+    gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
 

@@ -18,8 +18,6 @@
 #include "queue.h"
 #include <semphr.h>
 /* Standard includes                                                         */
-#include <pthread.h>
-#include <mqueue.h>
 #include <time.h>
 #include <unistd.h>
 

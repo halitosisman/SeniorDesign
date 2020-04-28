@@ -52,7 +52,7 @@ extern QueueHandle_t i2c_event_box; // because there's no other way for sl_event
 */
 void i2c_task(void * par);
 
-void gui_update(TaskHandle_t gui_task);
+void gui_update();
 
 #ifdef __cplusplus
 }
