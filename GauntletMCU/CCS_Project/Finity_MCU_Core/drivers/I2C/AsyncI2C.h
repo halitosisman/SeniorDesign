@@ -35,6 +35,8 @@ typedef struct _Async_I2C_Handle {
     I2C_Handle i2c_handle;
     uint32_t i2c_timeout_ms;
     sem_t i2c_lock;
+    sem_t pending_lock;
+    sem_t completed_lock;
     mqd_t pending;
     mqd_t completed;
 } Async_I2C_Handle;

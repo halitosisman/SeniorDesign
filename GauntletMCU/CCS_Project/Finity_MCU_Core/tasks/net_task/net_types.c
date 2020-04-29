@@ -8,7 +8,7 @@
 
 #include "net_types.h"
 
-
+pthread_mutex_t list_sync;
 
 struct Device_List device_list =
 {

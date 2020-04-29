@@ -12,22 +12,43 @@
 static mqd_t i2c_mailroom;
 static mqd_t gui_mailroom;
 
+static sem_t sync;
+uint8_t test = 0;
+
 void i2c_int_callback(uint_least8_t index) {
-    struct timespec ts;
-
-    clock_gettime(CLOCK_REALTIME, &ts);
-
-    char msg = 1;
-    mq_timedsend(i2c_mailroom, &msg, sizeof(msg), 0, &ts);
+    //sem_post(&sync);
+    test = 1;
 }
-
-
+/*
+struct mq_attr i2cbox =
+{
+ .mq_maxmsg = 1,
+ .mq_msgsize = sizeof(char)
+};
+struct mq_attr netbox =
+{
+ .mq_maxmsg = 1,
+ .mq_msgsize = sizeof(struct msgQueue)
+};
+struct mq_attr guibox =
+{
+ .mq_maxmsg = 1,
+ .mq_msgsize = sizeof(char)
+};
+*/
 void i2c_task(void * par) {
+    //((FGthread_arg_t *) par)->mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
+    //((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
+   // ((FGthread_arg_t *) par)->mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
+
     i2c_mailroom = ((FGthread_arg_t *) par)->mailroom[I2C_THREAD_ID];
     gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
+
+    sem_init(&sync, 0, 0);
+
     char notify_flags = 0;
 
-    AD7993_Config FG_AD7993_Handle = // TODO Move to task files
+    AD7993_Config FG_AD7993_Handle =
     {
      .config = FINITY_GAUNTLET_AD7993_CONF,
      .cycle_timer = AD7993_CYCLE_TIMER_T256,
@@ -54,7 +75,7 @@ void i2c_task(void * par) {
     GPIO_enableInt(GPIO_I2C_Int);
 
     // For debugging
-    adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
+ /*   adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
     adc_read = AD7993_read_config(AD7993, AD7993_CONF_ADDR);
     adc_read = AD7993_read_config(AD7993, AD7993_CYCLE_TIMER_ADDR);
     adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR);
@@ -72,20 +93,19 @@ void i2c_task(void * par) {
     adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 9);
     adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 10);
     adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 11);
-    adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
+    adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);*/
 
     init_FG_state();
     gui_update();
 
     while(1) {
-        mq_receive(i2c_mailroom, &notify_flags, sizeof(uint8_t), NULL);
+       // mq_receive(i2c_mailroom, &notify_flags, sizeof(uint8_t), NULL);
+        while (test == 0) {
 
-        if (notify_flags == 1) { // If the delay timer for the ADC has finished
-            sleep(10);
-            AD7993_start_read(AD7993);
         }
-        notify_flags = 0;
+        test = 0;
 
+        AD7993_start_read(AD7993);
         // Insert other I2C checks here if we decide to add them
 
         struct msgQueue netMsg;
@@ -99,17 +119,20 @@ void i2c_task(void * par) {
             r = AD7993_convert_result(static_cast<uint8_t *>(adc_read->readBuf)[i],
                                       static_cast<uint8_t *>(adc_read->readBuf)[i + 1]);
             if (r < I2C_THREAD_ADC_THRESH) {
+                pthread_mutex_lock(&list_sync);
                 if (update_FG_state(static_cast<Nav>(i / 2))) { // Update the top level state machine.
+                    pthread_mutex_unlock(&list_sync);
+                    // Signal the MQTT thread
+                    netMsg.event = USR_CMD;
+                    netMsg.msgPtr = NULL;
+                    netMsg.topLen = 0;
+                    mq_send(g_PBQueue, (char *) &netMsg, sizeof(netMsg), 0);
                 }
                 else {
+                    pthread_mutex_unlock(&list_sync);
                 }
-                // Signal the MQTT thread
-                netMsg.event = USR_CMD;
-                netMsg.msgPtr = NULL;
-                netMsg.topLen = 0;
-                mq_send(g_PBQueue, (char *) &netMsg, sizeof(netMsg), 0);
 
-                sleep(10);
+                usleep(10);
                 gui_update();
                 break;
             }

@@ -16,6 +16,13 @@ static bool device_accel_callback(uint8_t event);
 static bool device_temp_callback(uint8_t event);
 static bool command_callback(uint8_t event);
 
+FG_State outgoing_state =
+{
+ .device_type = Device_Motor,
+ .selected_command = NULL,
+ .selected_device = NULL
+ };
+
 FG_State FG_user_state =
 {
  .device_type = Device_Motor,
@@ -46,6 +53,7 @@ void init_FG_state()
 }
 
 
+
 // Note that the concept of direction here is relative to the state enum as viewed in the next editor, where upwards
 // corresponds to lower indices
 static bool device_null_callback(uint8_t event) {
@@ -56,14 +64,14 @@ static bool device_null_callback(uint8_t event) {
         else {
             FG_user_state.device_type -= 1;
         }
-        return false;
+        break;
     case Nav_Down:
         if (FG_user_state.device_type == Device_Count - 1) {
         }
         else {
             FG_user_state.device_type += 1;
         }
-        return false;
+        break;
     case Nav_Right:
         present_callback = state_callbacks[FG_user_state.device_type];
         switch (FG_user_state.device_type) {
@@ -74,7 +82,7 @@ static bool device_null_callback(uint8_t event) {
             else {
                 present_callback = state_callbacks[Device_Null];
             }
-            return false;
+            break;
         case Device_Motor:
             if (device_list.Motor != NULL) {
                 FG_user_state.selected_device = (struct Device *)(device_list.Motor);
@@ -82,7 +90,7 @@ static bool device_null_callback(uint8_t event) {
             else {
                 present_callback = state_callbacks[Device_Null];
             }
-            return false;
+            break;
         case Device_Accel:
             if (device_list.Accel != NULL) {
                 FG_user_state.selected_device = (struct Device *)(device_list.Accel);
@@ -90,7 +98,7 @@ static bool device_null_callback(uint8_t event) {
             else {
                 present_callback = state_callbacks[Device_Null];
             }
-            return false;
+            break;
         case Device_Temp:
             if (device_list.Temp != NULL) {
                 FG_user_state.selected_device = (struct Device *)(device_list.Temp);
@@ -98,7 +106,7 @@ static bool device_null_callback(uint8_t event) {
             else {
                 present_callback = state_callbacks[Device_Null];
             }
-            return false;
+            break;
         case Device_System:
             if (command_list.S != NULL) {
                 FG_user_state.selected_command = command_list.S;
@@ -106,16 +114,17 @@ static bool device_null_callback(uint8_t event) {
             else {
                 present_callback = state_callbacks[Device_Null];
             }
-            return false;
+            break;
         default:
             ERR_PRINT(LOGIC_ERROR);
         }
-        return false;
+        break;
     case Nav_Left:
-        return false;
+        break;
     default:
         ERR_PRINT(LOGIC_ERROR);
     }
+    outgoing_state = FG_user_state;
     return false;
 }
 
@@ -126,12 +135,12 @@ static bool device_light_callback(uint8_t event) {
         if ((struct Light *)(FG_user_state.selected_device)->next != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->next;
         }
-        return false;
+        break;
     case Nav_Down:
         if ((struct Light *)(FG_user_state.selected_device)->prev != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->prev;
         }
-        return false;
+        break;
     case Nav_Right:
         temp = (struct Light *)(FG_user_state.selected_device);
         if (temp->dimmable) {
@@ -141,14 +150,15 @@ static bool device_light_callback(uint8_t event) {
             FG_user_state.selected_command = command_list.L;
         }
         present_callback = state_callbacks[Device_Command];
-        return false;
+        break;
     case Nav_Left:
         FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
-        return false;
+        break;
     default:
         ERR_PRINT(LOGIC_ERROR);
     }
+    outgoing_state = FG_user_state;
     return false;
 }
 
@@ -159,12 +169,12 @@ static bool device_motor_callback(uint8_t event) {
         if ((struct Motor *)(FG_user_state.selected_device)->next != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->next;
         }
-        return false;
+        break;
     case Nav_Down:
         if ((struct Motor *)(FG_user_state.selected_device)->prev != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->prev;
         }
-        return false;
+        break;
     case Nav_Right:
         temp = (struct Motor *)(FG_user_state.selected_device);
         if (temp->setable && temp->reversable) {
@@ -180,14 +190,15 @@ static bool device_motor_callback(uint8_t event) {
             FG_user_state.selected_command = command_list.M;
         }
         present_callback = state_callbacks[Device_Command];
-        return false;
+        break;
     case Nav_Left:
         FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
-        return false;
+        break;
     default:
         ERR_PRINT(LOGIC_ERROR);
     }
+    outgoing_state = FG_user_state;
     return false;
 }
 
@@ -198,12 +209,12 @@ static bool device_accel_callback(uint8_t event) {
         if ((struct Accel *)(FG_user_state.selected_device)->next != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->next;
         }
-        return false;
+        break;
     case Nav_Down:
         if ((struct Accel *)(FG_user_state.selected_device)->prev != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->prev;
         }
-        return false;
+        break;
     case Nav_Right:
         temp = (struct Accel *)(FG_user_state.selected_device);
         if (temp->setable){
@@ -213,14 +224,15 @@ static bool device_accel_callback(uint8_t event) {
             FG_user_state.selected_command = command_list.A;
         }
         present_callback = state_callbacks[Device_Command];
-        return false;
+        break;
     case Nav_Left:
         FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
-        return false;
+        break;
     default:
         ERR_PRINT(LOGIC_ERROR);
     }
+    outgoing_state = FG_user_state;
     return false;
 }
 
@@ -231,12 +243,12 @@ static bool device_temp_callback(uint8_t event) {
         if ((struct Temp *)(FG_user_state.selected_device)->next != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->next;
         }
-        return false;
+        break;
     case Nav_Down:
         if ((struct Temp *)(FG_user_state.selected_device)->prev != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->prev;
         }
-        return false;
+        break;
     case Nav_Right:
         temp = (struct Temp *)(FG_user_state.selected_device);
         if (temp->setable){
@@ -246,14 +258,15 @@ static bool device_temp_callback(uint8_t event) {
             FG_user_state.selected_command = command_list.T;
         }
         present_callback = state_callbacks[Device_Command];
-        return false;
+        break;
     case Nav_Left:
         FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
-        return false;
+        break;
     default:
         ERR_PRINT(LOGIC_ERROR);
     }
+    outgoing_state = FG_user_state;
     return false;
 }
 static bool command_callback(uint8_t event) {
@@ -262,18 +275,29 @@ static bool command_callback(uint8_t event) {
         if (FG_user_state.selected_command->next != NULL) {
             FG_user_state.selected_command = FG_user_state.selected_command->next;
         }
-        return false;
+        break;
     case Nav_Down:
         if (FG_user_state.selected_command->prev != NULL) {
             FG_user_state.selected_command = FG_user_state.selected_command->prev;
         }
-        return false;
+        break;
     case Nav_Right:
+        outgoing_state = FG_user_state;
+        FG_user_state.device_type = Device_Motor;
+        FG_user_state.selected_command = NULL;
+        FG_user_state.selected_device = NULL;
+        present_callback = state_callbacks[Device_Null];
         return true; // no state update, but trigger action
     case Nav_Left:
         FG_user_state.selected_command = NULL;
-        present_callback = state_callbacks[Device_Command];
-        return false;
+        if (FG_user_state.device_type == Device_System) {
+            FG_user_state.selected_device = NULL;
+            present_callback = state_callbacks[Device_Null];
+        }
+        else {
+            present_callback = state_callbacks[FG_user_state.device_type];
+        }
+        break;
     default:
         break;
     }

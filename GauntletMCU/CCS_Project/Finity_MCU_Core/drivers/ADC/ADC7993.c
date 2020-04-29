@@ -156,7 +156,6 @@ I2C_Transaction * AD7993_read_conv(Async_I2C_Handle * AD7993_Handle) {
 void AD7993_start_read(Async_I2C_Handle* AD7993_Handle)
 {
     Async_I2C_enqueue(AD7993_Handle, &read_conv);
-    Async_I2C_process(AD7993_Handle);
 }
 
 I2C_Transaction* AD7993_end_read(Async_I2C_Handle* AD7993_Handle)

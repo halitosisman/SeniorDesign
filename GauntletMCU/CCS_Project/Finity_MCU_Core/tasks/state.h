@@ -33,9 +33,9 @@ typedef enum {
     Device_Accel,
     Device_Temp,
     Device_System,
-    Device_Count,
-    Device_Command,
-    State_Count
+    Device_Command = Device_System,
+    State_Count,
+    Device_Count = State_Count
 } State_List;
 
 typedef struct _FG_State {
@@ -44,6 +44,7 @@ typedef struct _FG_State {
     struct Device * selected_device;
 } FG_State;
 
+extern FG_State outgoing_state;
 extern FG_State FG_user_state;
 
 extern void init_FG_state();

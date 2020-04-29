@@ -135,9 +135,8 @@ void ILI_cfg(LCD_CFG setting)
 
 
 void lcd_init() {
-
     ILI_cfg(reset);
-    vTaskDelay(pdMS_TO_TICKS(5));
+    usleep(5);
     ILI_cfg(disp_off);
     ILI_cfg(pow1);
     ILI_cfg(pow2);
@@ -148,7 +147,7 @@ void lcd_init() {
     ILI_cfg(frctrl);
     ILI_cfg(slp_out);
     ILI_cfg(disp_on);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    usleep(500);
 }
 
 

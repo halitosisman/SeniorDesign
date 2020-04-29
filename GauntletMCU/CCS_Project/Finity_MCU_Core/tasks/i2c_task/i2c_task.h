@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 extern QueueHandle_t i2c_event_box; // because there's no other way for sl_events to signal net_task
-
+extern pthread_t i2c_thread;
 
 /*!
     \brief          net_task

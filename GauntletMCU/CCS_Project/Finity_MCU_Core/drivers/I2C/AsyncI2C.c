@@ -24,7 +24,7 @@ void Async_I2C_callback(I2C_Handle handle, I2C_Transaction *transaction, bool tr
 
         }
     }
-
+    sem_post(&(async_handle->completed_lock));
     sem_post(&(async_handle->i2c_lock));
 }
 
@@ -50,7 +50,10 @@ Async_I2C_Handle * Async_I2C_open(I2C_BitRate bitRate, uint32_t timeout)
     }
 
     device->i2c_handle = peripheral;
-    sem_init(&(device->i2c_lock), 0, 1);
+    sem_init(&(device->i2c_lock), 0, 0);
+    sem_post(&(device->i2c_lock));
+    sem_init(&(device->pending_lock), 0, 0);
+    sem_init(&(device->completed_lock), 0, 0);
     device->i2c_params = malloc(sizeof(I2C_Params));
     *(device->i2c_params) = par;
     device->i2c_timeout_ms = timeout;
@@ -72,7 +75,7 @@ void Async_I2C_close(Async_I2C_Handle* handle)
 bool Async_I2C_enqueue(Async_I2C_Handle* handle, I2C_Transaction* transaction)
 {
     mq_send(handle->pending, (char *) &transaction, sizeof(&transaction), 0);
-
+    sem_post(&(handle->pending_lock));
     return true;
 }
 
@@ -81,45 +84,46 @@ void Async_I2C_process(Async_I2C_Handle* handle)
 {
     int_fast16_t i2c_status;
     I2C_Transaction * pending[1];
-    struct timespec ts;
-
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_nsec += ASYNC_I2C_TIMEOUT_MS * 1000;
 
     // If I2C transactions are pending, the I2C callback releases this lock. Otherwise, the lock is immediately
     // relinquished.
-    if (sem_timedwait(&(handle->i2c_lock), &ts) == 0) {
-        if (mq_receive(handle->pending, (char *) pending, sizeof(I2C_Transaction *), 0) > 0) {
-            // important, pending should have the Async_I2C_Handle as an arg
-            i2c_status = I2C_transferTimeout(handle->i2c_handle, *pending, pdMS_TO_TICKS(ASYNC_I2C_TIMEOUT_MS));
-            if (i2c_status != I2C_STATUS_SUCCESS) {
-                while(1) {
+    if (sem_trywait(&(handle->i2c_lock)) == 0) {
+        if (sem_trywait(&(handle->pending_lock)) == 0) {
+            if (mq_receive(handle->pending, (char *) pending, sizeof(I2C_Transaction *), 0) > 0) {
+                // important, pending should have the Async_I2C_Handle as an arg
+                i2c_status = I2C_transfer(handle->i2c_handle, *pending);
+                if (i2c_status != true) {
+                    while(1) {
 
+                    }
                 }
-            }
-        }
-        // No I2C transactions pending, no need to lock the i2c peripheral
-        else if (sem_post(&(handle->i2c_lock)) != 0) {
-            while(1) {
 
             }
+            else {
+                sem_post(&(handle->i2c_lock));
+                sem_post(&(handle->pending_lock));
+            }
         }
-
+        else {
+            sem_post(&(handle->i2c_lock));
+        }
     }
 }
 
 I2C_Transaction* Async_I2C_dequeue(Async_I2C_Handle* handle)
 {
     I2C_Transaction * completed[1];
-    struct timespec ts;
 
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_nsec += ASYNC_I2C_TIMEOUT_MS * 1000;
-
-    if (mq_timedreceive(handle->completed, (char *) completed, sizeof(I2C_Transaction *), NULL, &ts) > 0) {
-        return *completed;
+    if (sem_trywait(&(handle->completed_lock)) == 0) {
+        if (mq_receive(handle->completed, (char *) completed, sizeof(I2C_Transaction *), 0) > 0) {
+            return *completed;
+        }
+        else{
+            sem_post(&(handle->completed_lock));
+            return NULL;
+        }
     }
-    else{
+    else {
         return NULL;
     }
 }

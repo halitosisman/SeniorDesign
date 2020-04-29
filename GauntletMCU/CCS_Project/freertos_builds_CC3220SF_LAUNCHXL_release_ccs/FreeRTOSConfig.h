@@ -66,7 +66,7 @@ supported, or if both static and dynamic allocation are supported. */
 #define configMINIMAL_STACK_SIZE        ( ( unsigned short ) 256 )
 #define configMAX_TASK_NAME_LEN         ( 12 )
 
-#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0x8000 ) )
+#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0x10000 ) )
 
 /* Default stack size for TI-POSIX threads (in words) */
 #define configPOSIX_STACK_SIZE          ( ( unsigned short ) 512 )

@@ -53,14 +53,14 @@
 #include "configs/thread_config.h"
 
 pthread_t thread;
+pthread_t i2c_thread;
+pthread_t gui_thread;
+FGthread_arg_t thread_args;
 /*
  *  ======== main ========
  */
 int main(void)
 {
-    FGthread_arg_t thread_args;
-    pthread_t i2c_thread;
-    pthread_t gui_thread;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
     int retc;
@@ -70,20 +70,20 @@ int main(void)
     Board_init();
 
     // Initialize the thread communication data structures
-    struct mq_attr i2cbox;
-    i2cbox.mq_maxmsg = 1;
-    i2cbox.mq_msgsize = sizeof(char);
-    thread_args.mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
+//    struct mq_attr i2cbox;
+//    i2cbox.mq_maxmsg = 1;
+ //   i2cbox.mq_msgsize = sizeof(char);
+  //  thread_args.mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
 
-    struct mq_attr guibox;
-    i2cbox.mq_maxmsg = 1;
-    i2cbox.mq_msgsize = sizeof(char);
-    thread_args.mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
+//    struct mq_attr guibox;
+//    i2cbox.mq_maxmsg = 1;
+ //   i2cbox.mq_msgsize = sizeof(char);
+ //   thread_args.mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
 
-    struct mq_attr netbox;
-    i2cbox.mq_maxmsg = 10;
-    i2cbox.mq_msgsize = sizeof(struct msgQueue);
-    thread_args.mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
+//    struct mq_attr netbox;
+ //   i2cbox.mq_maxmsg = 10;
+ //   i2cbox.mq_msgsize = sizeof(struct msgQueue);
+ //   thread_args.mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
 
     //pthread_barrier_init(&(thread_args.sync[I2C_THREAD_ID]), )
 
@@ -104,7 +104,6 @@ int main(void)
     retc = pthread_attr_setdetachstate(&pAttrs, detachState);
     if(retc != 0)
     {
-        /* pthread_attr_setdetachstate() failed */
         while(1)
         {
             ;
@@ -113,10 +112,9 @@ int main(void)
 
     pthread_attr_setschedparam(&pAttrs, &priParam);
 
-    retc |= pthread_attr_setstacksize(&pAttrs, I2C_THREAD_STACK_SIZE / 4);
+    retc |= pthread_attr_setstacksize(&pAttrs, I2C_THREAD_STACK_SIZE * 4);
     if(retc != 0)
     {
-        /* pthread_attr_setstacksize() failed */
         while(1)
         {
             ;
@@ -126,7 +124,6 @@ int main(void)
     retc = pthread_create(&i2c_thread, &pAttrs, (void * (*) (void *))i2c_task, &thread_args);
     if(retc != 0)
     {
-        /* pthread_create() failed */
         while(1)
         {
             ;
@@ -135,7 +132,6 @@ int main(void)
 
 
 
-    /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = NET_TASK_SPAWNER_PRIORITY; // 1
 
@@ -143,7 +139,6 @@ int main(void)
     retc = pthread_attr_setdetachstate(&pAttrs, detachState);
     if(retc != 0)
     {
-        /* pthread_attr_setdetachstate() failed */
         while(1)
         {
             ;
@@ -155,17 +150,15 @@ int main(void)
     retc |= pthread_attr_setstacksize(&pAttrs, 4096);
     if(retc != 0)
     {
-        /* pthread_attr_setstacksize() failed */
         while(1)
         {
             ;
         }
     }
 
-    retc = pthread_create(&thread, &pAttrs, (void * (*) (void *))net_task, NULL);
+    retc = pthread_create(&thread, &pAttrs, (void * (*) (void *))net_task, &thread_args);
     if(retc != 0)
     {
-        /* pthread_create() failed */
         while(1)
         {
             ;
@@ -205,7 +198,7 @@ int main(void)
 
     pthread_attr_setschedparam(&pAttrs, &priParam);
 
-    retc |= pthread_attr_setstacksize(&pAttrs, GUI_THREAD_STACK_SIZE / 4);
+    retc |= pthread_attr_setstacksize(&pAttrs, GUI_THREAD_STACK_SIZE * 4);
     if(retc != 0)
     {
         /* pthread_attr_setstacksize() failed */

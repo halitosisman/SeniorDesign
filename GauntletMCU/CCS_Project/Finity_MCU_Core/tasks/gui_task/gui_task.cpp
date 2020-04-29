@@ -63,7 +63,7 @@ void gui_task(void * par) {
          &(default_command[1]),
          &(default_command[2])
         };
-
+        pthread_mutex_lock(&list_sync);
         // User is not in the command selection screen
         if (FG_user_state.selected_command != NULL) {
             if (FG_user_state.selected_command->next != NULL) {
@@ -125,10 +125,10 @@ void gui_task(void * par) {
                 break;
             }
         }
-
-        state_tracker.update((int8_t *)(cmd[0]->name), cmd[0]->name_len - 1,
-                             (int8_t *)(cmd[1]->name), cmd[1]->name_len - 1,
-                             (int8_t *)(cmd[2]->name), cmd[2]->name_len - 1);
+        pthread_mutex_unlock(&list_sync);
+        state_tracker.update((int8_t *)(cmd[0]->name), cmd[0]->name_len,
+                             (int8_t *)(cmd[1]->name), cmd[1]->name_len,
+                             (int8_t *)(cmd[2]->name), cmd[2]->name_len);
     }
 
 }

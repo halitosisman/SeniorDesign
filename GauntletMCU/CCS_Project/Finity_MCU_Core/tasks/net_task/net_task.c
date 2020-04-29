@@ -214,6 +214,10 @@ void publish_command(void * device, struct Command* command)
     if (device == NULL)
     {
         // System
+        if (command->command[0] == 'u')
+        {
+            clean_device_list(&(device_list));
+        }
         MQTTClient_publish(gMqttClient,
                            (char *) SYSTEM_PUB_TOPIC,
                            SYSTEM_PUB_TOPIC_LEN,
@@ -479,16 +483,16 @@ void add_device(int type, void * new_device)
     switch(type)
     {
         case 0:
-            device_group = (struct Light*) &(device_list.Light);
+            device_group = (struct Light*) (device_list.Light);
             break;
         case 1:
-            device_group = (struct Light*) &(device_list.Motor);
+            device_group = (struct Light*) (device_list.Motor);
             break;
         case 2:
-            device_group = (struct Light*) &(device_list.Accel);
+            device_group = (struct Light*) (device_list.Accel);
             break;
         case 3:
-            device_group = (struct Light*) &(device_list.Temp);
+            device_group = (struct Light*) (device_list.Temp);
             break;
     }
 
@@ -632,7 +636,6 @@ void find_device(int type, char * id, float status)
 
         device_group = device_group->next;
     }
-
 }
 
 // Free one device type
@@ -658,22 +661,15 @@ void clean_device_type(void *device)
 void clean_device_list(struct Device_List* devices)
 {
     clean_device_type(devices->Light);
+    devices->Light = NULL;
     clean_device_type(devices->Motor);
+    devices->Motor = NULL;
     clean_device_type(devices->Accel);
+    devices->Accel = NULL;
     clean_device_type(devices->Temp);
+    devices->Temp = NULL;
 }
 
-void update_devices()
-{
-    clean_device_list(&(device_list));
-
-    MQTTClient_publish(gMqttClient,
-            (char *) SYSTEM_PUB_TOPIC,
-            SYSTEM_PUB_TOPIC_LEN,
-            (char *) SYSTEM_UPDATE,
-            SYSTEM_UPDATE_LEN,
-            MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
-}
 
 
 
@@ -712,11 +708,14 @@ void * MqttClient(void *pvParameters)
         mq_receive(g_PBQueue, (char*) &queueElemRecv, sizeof(struct msgQueue),
                    NULL);
 
+
         switch(queueElemRecv.event)
         {
         /*msg received by client from remote broker (on a topic      */
         /*subscribed by local client)                                */
         case MSG_RECV_BY_CLIENT:
+            pthread_mutex_lock(&list_sync);
+
             tmpBuff = (char *) ((char *) queueElemRecv.msgPtr + 12);
             // status/#
             if(strncmp(tmpBuff, SUBSCRIPTION_TOPIC0, 7) == 0)
@@ -765,7 +764,7 @@ void * MqttClient(void *pvParameters)
                     {
                     case 0:
                         //Update connected devices
-                        update_devices();
+                      //  update_devices();
                         break;
                     }
 
@@ -1004,6 +1003,8 @@ void * MqttClient(void *pvParameters)
             }
 
             free(queueElemRecv.msgPtr);
+
+            pthread_mutex_unlock(&list_sync);
             break;
 
             /*On-board client disconnected from remote broker, only      */
@@ -1024,7 +1025,9 @@ void * MqttClient(void *pvParameters)
             return(NULL);
 
         case USR_CMD:
-            publish_command(FG_user_state.selected_device, FG_user_state.selected_command);
+            pthread_mutex_lock(&list_sync);
+            publish_command(outgoing_state.selected_device, outgoing_state.selected_command);
+            pthread_mutex_unlock(&list_sync);
             break;
 
         default:
@@ -1505,9 +1508,33 @@ int32_t DisplayAppBanner(char* appName,
 
     return(ret);
 }
-
+struct mq_attr i2cbox =
+{
+ .mq_maxmsg = 1,
+ .mq_msgsize = sizeof(char)
+};
+struct mq_attr netbox =
+{
+ .mq_maxmsg = 1,
+ .mq_msgsize = sizeof(struct msgQueue)
+};
+struct mq_attr guibox =
+{
+ .mq_maxmsg = 1,
+ .mq_msgsize = sizeof(char)
+};
 
 void net_task(void * par) {
+
+    ((FGthread_arg_t *) par)->mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
+    ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
+    ((FGthread_arg_t *) par)->mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
+
+    pthread_mutexattr_t attr;
+
+    pthread_mutexattr_init(&attr);
+    pthread_mutex_init(&list_sync, &attr);
+
     uint32_t count = 0;
 
     pthread_attr_t pAttrs_spawn;
@@ -1527,7 +1554,7 @@ void net_task(void * par) {
     pthread_attr_init(&pAttrs_spawn);
     priParam.sched_priority = SPAWN_TASK_PRIORITY;
     retc = pthread_attr_setschedparam(&pAttrs_spawn, &priParam);
-    retc |= pthread_attr_setstacksize(&pAttrs_spawn, TASKSTACKSIZE);
+    retc |= pthread_attr_setstacksize(&pAttrs_spawn, TASKSTACKSIZE * 2);
     retc |= pthread_attr_setdetachstate
             (&pAttrs_spawn, PTHREAD_CREATE_DETACHED);
 
@@ -1542,6 +1569,7 @@ void net_task(void * par) {
         }
     }
 
+    // https://e2e.ti.com/support/wireless-connectivity/wifi/f/968/t/707300 interesting
     retc = sl_Start(0, 0, 0);
     if(retc < 0)
     {
@@ -1604,7 +1632,7 @@ void net_task(void * par) {
 
         while(gResetApplication == false)
         {
-            ;
+            sleep(10);
         }
 
         UART_PRINT("TO Complete - Closing all threads and resources\r\n");
