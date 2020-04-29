@@ -228,6 +228,12 @@ void publish_command(void * device, struct Command* command)
                                (char *) command->command,
                                command->command_len,
                                MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+            MQTTClient_publish(gMqttClient,
+                               (char *) SYSTEM_PUB_TOPIC,
+                               SYSTEM_PUB_TOPIC_LEN,
+                               (char *) CLEAR_COMMAND,
+                               CLEAR_COMMAND_LEN,
+                               MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
         }
         else
         {
@@ -237,6 +243,12 @@ void publish_command(void * device, struct Command* command)
                                SYST_PUB_TOPIC_LEN,
                                (char *) command->command,
                                command->command_len,
+                               MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+            MQTTClient_publish(gMqttClient,
+                               (char *) SYST_PUB_TOPIC,
+                               SYST_PUB_TOPIC_LEN,
+                               (char *) CLEAR_COMMAND,
+                               CLEAR_COMMAND_LEN,
                                MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
         }
     }

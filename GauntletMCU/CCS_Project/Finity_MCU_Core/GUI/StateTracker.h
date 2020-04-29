@@ -14,7 +14,7 @@
 class State_Tracker : public Window
 {
 public:
-    State_Tracker();
+    State_Tracker(Cord2S log_loc, Cord2S default_size);
     virtual ~State_Tracker();
     virtual void update(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3);
     virtual void init();

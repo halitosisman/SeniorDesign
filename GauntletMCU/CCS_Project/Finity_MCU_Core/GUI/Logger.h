@@ -13,7 +13,7 @@
 
 class Logger : public Window {
 public:
-    explicit Logger();
+    explicit Logger(Cord2S log_loc, Cord2S default_size);
     virtual void print(int8_t * str, int size);
     virtual void print(int n);
     virtual void init();

@@ -12,7 +12,7 @@
 static Cord2S log_loc = {0, 0};
 static Cord2S default_size = {300, 50};
 
-Device_Display::Device_Display() : Window(&g_sContext, log_loc, default_size)
+DeviceDisplay::DeviceDisplay() : Window(&g_sContext, log_loc, default_size)
 {
     Cord2S s =
     {
@@ -21,52 +21,28 @@ Device_Display::Device_Display() : Window(&g_sContext, log_loc, default_size)
     };
     this->setSize(s);
 
-    this->locs[0] = {100, 10};  // Device Type
-    this->locs[1] = {170, 10};  // Device ID
-    this->locs[2] = {240, 10};  // Device Name
-    for (int i = 0; i < 3; i++) { //access all the arguments assigned to valist
-        this->s_bbox[i].xMax = this->locs[i].x + 60;
-        this->s_bbox[i].xMin = this->locs[i].x;
-        this->s_bbox[i].yMax = this->locs[i].y + 30;
-        this->s_bbox[i].yMin = this->locs[i].y;
-    }
-
-    this->locs[3] = {100, 50};  // Device Special Type(dim, setable, etc)
-    this->locs[4] = {110, 80};  // Device Special status (dim, setable, etc)
-    this->locs[5] = {100, 120}; // Device Special Type 2(dim, setable, etc)
-    this->locs[6] = {110, 150}; // Device Special status 2(dim, setable, etc)
-    for (int i = 3; i < 7; i++) { //access all the arguments assigned to valist
-        this->s_bbox[i].xMax = this->locs[i].x + 60;
-        this->s_bbox[i].xMin = this->locs[i].x;
-        this->s_bbox[i].yMax = this->locs[i].y + 30;
-        this->s_bbox[i].yMin = this->locs[i].y;
-    }
-
-    this->locs[7] = {170, 50};   // Device status static
-    this->s_bbox[7].xMax = this->locs[7].x + 60;
-    this->s_bbox[7].xMin = this->locs[7].x;
-    this->s_bbox[7].yMax = this->locs[7].y + 30;
-    this->s_bbox[7].yMin = this->locs[7].y;
-
-    this->locs[8] = {180, 90};   // Device status current
-    this->s_bbox[8].xMax = this->locs[8].x + 80;
-    this->s_bbox[8].xMin = this->locs[8].x;
-    this->s_bbox[8].yMax = this->locs[8].y + 80;
-    this->s_bbox[8].yMin = this->locs[8].y;
+ /*   this->locs[Element_Type] = {5, 5};  // Device Type
+    this->locs[Element_ID] = {5, 30};  // Device ID
+    this->locs[Element_Name] = {5, 55};  // Device Name
+    this->locs[Element_Special_Type] = {100, 5};  // Device Special Type(dim, setable, etc)
+    this->locs[Element_Special_Status] = {110, 30};  // Device Special status (dim, setable, etc)
+    this->locs[Element_Special_Type2] = {100, 60}; // Device Special Type 2(dim, setable, etc)
+    this->locs[Element_Special_Status2] = {110, 80}; // Device Special status 2(dim, setable, etc)
+    this->locs[Element_Status_Static] = {170, 5};   // Device status static
+    this->locs[Element_Status_Current] = {180, 5};   // Device status current*/
 }
 
-Device_Display::~Device_Display()
+DeviceDisplay::~DeviceDisplay()
 {
     // TODO Auto-generated destructor stub
 }
 
-void Device_Display::init() {
+void DeviceDisplay::init() {
 }
 
-void Device_Display::update_status(FG_State* FG_curr_state)
+void DeviceDisplay::update_status(FG_State* FG_curr_state)
 {
     Cord2S loc = this->getloc();
-    this->clr_region(this->s_bbox[8]);
     
     std::string curr_status = std::to_string(FG_curr_state->selected_device->status);
     int32_t length = curr_status.length();
@@ -75,11 +51,9 @@ void Device_Display::update_status(FG_State* FG_curr_state)
     this->drawString((int8_t *)curr_status.c_str(), length - 1, this->locs[8].x, this->locs[8].y, true);
 }
 
-void Device_Display::update_device_info(FG_State* FG_curr_state)
+void DeviceDisplay::update_device_info(FG_State* FG_curr_state)
 {
-    for(uint8_t i = 0; i < 9; i++) {
-        this->clr_region(this->s_bbox[i]);
-    }
+    this->clear();
 
     if (FG_curr_state->selected_device != nullptr) {
         switch(FG_curr_state->selected_device->ID[0])

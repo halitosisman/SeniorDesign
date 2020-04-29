@@ -16,19 +16,32 @@
 #include "state.h"
 
 
-class Device_Display : public Window
+typedef enum {
+    Element_Type = 0,
+    Element_ID,
+    Element_Name,
+    Element_Special_Type,
+    Element_Special_Status,
+    Element_Special_Type2,
+    Element_Special_Status2,
+    Element_Status_Static,
+    Element_Status_Current,
+    Element_Count
+} Device_Elements;
+
+
+class DeviceDisplay : public Window
 {
 public:
-    Device_Display();
-    virtual ~Device_Display();
+    DeviceDisplay();
+    virtual ~DeviceDisplay();
     virtual void update_status(FG_State*);
     virtual void update_device_info(FG_State*);
     virtual void init();
 private:
-    Cord2D locs[9];
+    Cord2D locs[Element_Count];
     Cord2D s_size;
     uint8_t s_count;
-    Graphics_Rectangle s_bbox[9];
 };
 
 #endif /* GUI_DEVICEDISPLAY_H_ */

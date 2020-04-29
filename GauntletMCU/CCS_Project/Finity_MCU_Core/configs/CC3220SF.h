@@ -47,6 +47,7 @@
 
 
 #include "stdint.h"
+#include <ti/drivers/I2C.h>
 
 /* Common interface includes                                                 */
 #include "tasks/net_task/network_if.h"

@@ -8,10 +8,7 @@
 #include <GUI/StateTracker.h>
 
 
-static Cord2S log_loc = {0, 0};
-static Cord2S default_size = {40, 40};
-
-State_Tracker::State_Tracker() : Window(&g_sContext, log_loc, default_size)
+State_Tracker::State_Tracker(Cord2S log_loc, Cord2S default_size) : Window(&g_sContext, log_loc, default_size)
 {
     Cord2S s =
     {

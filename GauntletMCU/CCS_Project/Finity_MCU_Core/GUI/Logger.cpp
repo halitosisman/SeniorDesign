@@ -8,10 +8,7 @@
 #include <GUI/Logger.h>
 
 
-static Cord2S log_loc = {0, 199};
-static Cord2S default_size = {300, 20};
-
-Logger::Logger() : Window(&g_sContext, log_loc, default_size)
+Logger::Logger(Cord2S log_loc, Cord2S default_size) : Window(&g_sContext, log_loc, default_size)
 {
     Cord2S s =
     {

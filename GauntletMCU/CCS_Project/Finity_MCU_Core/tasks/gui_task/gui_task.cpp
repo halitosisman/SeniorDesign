@@ -45,7 +45,7 @@ void gui_task(void * par) {
     gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
-    Device_Display device_display = Device_Display();
+    DeviceDisplay device_display = DeviceDisplay();
 
     FG_GUI_init();
     logger.init();
