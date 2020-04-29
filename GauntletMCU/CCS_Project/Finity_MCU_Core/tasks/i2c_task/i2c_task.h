@@ -23,7 +23,7 @@
 #include "util/uart_term.h"
 #include "util/error_manifest.h"
 
-#include "tasks/state.h"
+#include "state.h"
 
 #include "drivers/LCD/FG_graphics.h"
 #include "GUI/FG_GUI.h" // TODO REMOVE ONCE SMAT IS DONE

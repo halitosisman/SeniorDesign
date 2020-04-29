@@ -7,11 +7,6 @@
 
 #include <GUI/Window.h>
 
-Window::Window(Graphics_Context * context, Cord2S loc)
-{
-    this->context = context;
-    this->loc = loc;
-}
 
 Cord2D Window::transform_cord(int32_t x, int32_t y)
 {
@@ -58,4 +53,39 @@ void Window::drawPixel(int32_t x, int32_t y, int32_t color)
     Cord2D c = this->transform_cord(x, y);
     Graphics_setForegroundColor(this->getContext(), color);
     Graphics_drawPixel(this->context, c.x, c.y);
+}
+
+void Window::setSize(Cord2S s)
+{
+    this->size = s;
+}
+
+Window::Window(Graphics_Context* context, Cord2S loc, Cord2S size)
+{
+    this->context = context;
+    this->loc = loc;
+    this->size = size;
+}
+
+void Window::clear()
+{
+    Graphics_Rectangle clr_region =
+    {
+     .xMax = this->getSize().x,
+     .xMin = 0,
+     .yMax = this->getSize().y,
+     .yMin = 0
+    };
+    this->clr_region(clr_region);
+}
+
+Cord2S Window::getSize()
+{
+    return this->size;
+}
+
+void Window::drawStringCentered(int8_t* string, int32_t lLength, int32_t x, int32_t y, bool opaque)
+{
+    Cord2D c = this->transform_cord(x, y);
+    Graphics_drawStringCentered(this->context, string, lLength, c.x, c.y, opaque);
 }

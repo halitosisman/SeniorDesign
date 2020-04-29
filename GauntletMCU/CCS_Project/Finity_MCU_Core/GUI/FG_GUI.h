@@ -11,6 +11,7 @@
 
 #include <GUI/Logger.h>
 #include <GUI/StateTracker.h>
+#include <GUI/DeviceDisplay.h>
 
 #ifdef __cplusplus
 extern "C" {

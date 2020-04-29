@@ -36,7 +36,7 @@ extern Graphics_Context g_sContext;
 extern "C" {
 #endif
 
-extern const Graphics_Font g_sFontCm12;
+extern const Graphics_Font g_sFontCm16;
 
 extern void FG_graphics_init();
 extern void FG_graphics_test();

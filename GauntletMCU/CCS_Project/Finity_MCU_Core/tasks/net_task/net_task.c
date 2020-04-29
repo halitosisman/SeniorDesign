@@ -714,7 +714,6 @@ void * MqttClient(void *pvParameters)
         /*msg received by client from remote broker (on a topic      */
         /*subscribed by local client)                                */
         case MSG_RECV_BY_CLIENT:
-            pthread_mutex_lock(&list_sync);
 
             tmpBuff = (char *) ((char *) queueElemRecv.msgPtr + 12);
             // status/#
@@ -1003,8 +1002,6 @@ void * MqttClient(void *pvParameters)
             }
 
             free(queueElemRecv.msgPtr);
-
-            pthread_mutex_unlock(&list_sync);
             break;
 
             /*On-board client disconnected from remote broker, only      */
@@ -1025,9 +1022,7 @@ void * MqttClient(void *pvParameters)
             return(NULL);
 
         case USR_CMD:
-            pthread_mutex_lock(&list_sync);
             publish_command(outgoing_state.selected_device, outgoing_state.selected_command);
-            pthread_mutex_unlock(&list_sync);
             break;
 
         default:

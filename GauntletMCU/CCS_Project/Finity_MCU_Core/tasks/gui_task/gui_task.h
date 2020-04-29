@@ -19,7 +19,7 @@
 #include "tasks/FGtask.h"
 #include "GUI/FG_GUI.h"
 
-#include "tasks/state.h"
+#include "state.h"
 
 #define SL_TASK_STACK_SIZE 2048 // copied from TI's tcpecho example
 #define SPAWN_TASK_PRIORITY 9 // also copied from TI's tcpecho example

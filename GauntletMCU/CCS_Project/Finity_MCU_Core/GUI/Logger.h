@@ -18,7 +18,6 @@ public:
     virtual void print(int n);
     virtual void init();
 private:
-    Cord2S textbox_size;
     Cord2S txt_start;
     Cord2S prompt_start;
 };

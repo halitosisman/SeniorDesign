@@ -9,7 +9,6 @@
 
 #include "i2c_task.h"
 
-static mqd_t i2c_mailroom;
 static mqd_t gui_mailroom;
 
 static sem_t sync;
@@ -41,12 +40,9 @@ void i2c_task(void * par) {
     //((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
    // ((FGthread_arg_t *) par)->mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
 
-    i2c_mailroom = ((FGthread_arg_t *) par)->mailroom[I2C_THREAD_ID];
     gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
 
     sem_init(&sync, 0, 0);
-
-    char notify_flags = 0;
 
     AD7993_Config FG_AD7993_Handle =
     {
@@ -73,27 +69,6 @@ void i2c_task(void * par) {
     GPIO_setConfig(GPIO_I2C_Int, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
     GPIO_setCallback(GPIO_I2C_Int, i2c_int_callback);
     GPIO_enableInt(GPIO_I2C_Int);
-
-    // For debugging
- /*   adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);
-    adc_read = AD7993_read_config(AD7993, AD7993_CONF_ADDR);
-    adc_read = AD7993_read_config(AD7993, AD7993_CYCLE_TIMER_ADDR);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 1);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 2);
-
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 3);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 4);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 5);
-
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 6);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 7);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 8);
-
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 9);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 10);
-    adc_read = AD7993_read_config(AD7993, AD7993_CH_CONFIG_BASE_ADDR + 11);
-    adc_read = AD7993_read_config(AD7993, AD7993_ALRT_STATUS_ADDR);*/
 
     init_FG_state();
     gui_update();

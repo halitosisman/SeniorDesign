@@ -14,21 +14,27 @@
 
 class Window {
 public:
-    explicit Window(Graphics_Context * context, Cord2S loc);
+ //   explicit Window(Graphics_Context * context, Cord2S loc);
+    explicit Window(Graphics_Context * context, Cord2S loc, Cord2S size);
     virtual void init()=0;
 
     virtual Graphics_Context * getContext();
     virtual void setContext(Graphics_Context * context);
     virtual Cord2S getloc();
     virtual void clr_region(Graphics_Rectangle region);
+    virtual void setSize(Cord2S s);
+    virtual Cord2S getSize();
+    virtual void clear();
 protected:
     virtual Cord2D transform_cord(int32_t x, int32_t y);
     virtual void drawString(int8_t *string, int32_t lLength, int32_t x, int32_t y, bool opaque);
+    virtual void drawStringCentered(int8_t *string, int32_t lLength, int32_t x, int32_t y, bool opaque);
     virtual void drawPixel(int32_t x, int32_t y, int32_t color);
 
 private:
     Graphics_Context * context;
     Cord2S loc;
+    Cord2S size;
 };
 
 

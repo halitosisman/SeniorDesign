@@ -45,10 +45,12 @@ void gui_task(void * par) {
     gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
+    Device_Display device_display = Device_Display();
 
     FG_GUI_init();
     logger.init();
     state_tracker.init();
+    device_display.init();
     while (1) {
         struct Command default_command[3] =
         {
@@ -125,10 +127,16 @@ void gui_task(void * par) {
                 break;
             }
         }
-        pthread_mutex_unlock(&list_sync);
         state_tracker.update((int8_t *)(cmd[0]->name), cmd[0]->name_len,
                              (int8_t *)(cmd[1]->name), cmd[1]->name_len,
                              (int8_t *)(cmd[2]->name), cmd[2]->name_len);
+        if(FG_user_state.selected_command != NULL) {
+            device_display.update_status(&(FG_user_state));
+        }
+        else if (FG_user_state.selected_device != NULL) {
+            device_display.update_device_info(&(FG_user_state));
+        }
+        pthread_mutex_unlock(&list_sync);
     }
 
 }

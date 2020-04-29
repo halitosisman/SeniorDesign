@@ -9,21 +9,20 @@
 
 
 static Cord2S log_loc = {0, 0};
+static Cord2S default_size = {40, 40};
 
-State_Tracker::State_Tracker() : Window(&g_sContext, log_loc)
+State_Tracker::State_Tracker() : Window(&g_sContext, log_loc, default_size)
 {
-    this->locs[0] = {10, 10};
-    this->locs[1] = {10, 50};
-    this->locs[2] = {10, 90};
-    this->s_size.x = 80;
-    this->s_size.y = 30;
+    Cord2S s =
+    {
+     .x = static_cast<short>(Graphics_getWidthOfDisplay(g_sContext.display)),
+     .y = static_cast<short>(15 + 2 * Graphics_getStringHeight(this->getContext()))
+    };
+    this->setSize(s);
+    this->locs[0] = {5, 5};
+    this->locs[1] = {this->getSize().x / 2, Graphics_getStringHeight(this->getContext()) * 2 + 5};
+    this->locs[2] = {5, 5};
     this->s_count = 3;
-    for (int i = 0; i < 3; i++) { //access all the arguments assigned to valist
-        this->s_bbox[i].xMax = this->locs[i].x + this->s_size.x;
-        this->s_bbox[i].xMin = this->locs[i].x;
-        this->s_bbox[i].yMax = this->locs[i].y + this->s_size.y;
-        this->s_bbox[i].yMin = this->locs[i].y;
-    }
 }
 
 State_Tracker::~State_Tracker()
@@ -36,12 +35,15 @@ void State_Tracker::init() {
 
 void State_Tracker::update(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3)
 {
-    Cord2S loc = this->getloc();
-    for(uint8_t i = 0; i < 3; i++) {
-        this->clr_region(this->s_bbox[i]);
-    }
-    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
-    this->drawString(s1, c1, this->locs[0].x, this->locs[0].y, true);
-    this->drawString(s2, c2, this->locs[1].x, this->locs[1].y, true);
-    this->drawString(s3, c3, this->locs[2].x, this->locs[2].y, true);
+    this->clear();
+    Graphics_setBackgroundColor(this->getContext(), GRAPHICS_COLOR_BLACK);
+    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_CRIMSON);
+    this->drawString(s1, c1, this->locs[0].x, this->locs[0].y, false);
+
+    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_WHITE);
+    this->drawStringCentered(s2, c2, this->locs[1].x, this->locs[1].y, false);
+
+    Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_CRIMSON);
+    this->locs[2].x = this->getSize().x - 10 - static_cast<short>(Graphics_getStringWidth(this->getContext(), s3, c3));
+    this->drawString(s3, c3, this->locs[2].x, this->locs[2].y, false);
 }

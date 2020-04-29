@@ -57,7 +57,7 @@ Graphics_Context g_sContext =
      .clipRegion.xMax = LCD_COLUMNS - 1,
      .clipRegion.yMax = LCD_ROWS - 1,
      .display = &wrist_display,
-     .font = &g_sFontCm12,
+     .font = &g_sFontCm16,
      .foreground = 0,
      .size = sizeof(Graphics_Context),
      .background = 0
@@ -224,8 +224,8 @@ static void pfnRectFill(const Graphics_Display * pDisplay, const Graphics_Rectan
 
     cl_set.data[0] = pRect->xMin >> 8;
     cl_set.data[1] = pRect->xMin & 0xFF;
-    cl_set.data[2] = pRect->yMax >> 8;
-    cl_set.data[3] = pRect->yMax & 0xFF;
+    cl_set.data[2] = pRect->xMax >> 8;
+    cl_set.data[3] = pRect->xMax & 0xFF;
 
     ILI_cfg(pg_set);
     ILI_cfg(cl_set);

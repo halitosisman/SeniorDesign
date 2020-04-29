@@ -7,23 +7,20 @@
 
 #include <GUI/Logger.h>
 
-/*Graphics_Display log_display =
-{
-     .displayData = NULL, // TODO Move hardcoded values to config at some point
-     .heigth = 240,
-     .pFxns = g_sContext.display->pFxns,
-     .size = sizeof(Graphics_Display),
-     .width = 320
-};*/
-
 
 static Cord2S log_loc = {0, 199};
+static Cord2S default_size = {300, 20};
 
-Logger::Logger() : Window(&g_sContext, log_loc)
+Logger::Logger() : Window(&g_sContext, log_loc, default_size)
 {
+    Cord2S s =
+    {
+     .x = Graphics_getWidthOfDisplay(this->getContext()->display),
+     .y = Graphics_getHeightOfDisplay(this->getContext()->display) - 11 - Graphics_getStringHeight(this->getContext())
+    };
+    this->setSize(s);
     this->txt_start = {0, 0};
-    this->prompt_start = {10, 20};
-    this->textbox_size = {300, 20};
+    this->prompt_start = {10, 5};
 }
 
 void Logger::print(int8_t * str, int size)
@@ -31,9 +28,9 @@ void Logger::print(int8_t * str, int size)
     Cord2S loc = this->getloc();
     Graphics_Rectangle clr_region =
     {
-     .xMax = this->textbox_size.x,
+     .xMax = this->getSize().x,
      .xMin = this->txt_start.x,
-     .yMax = this->textbox_size.y,
+     .yMax = this->getSize().y,
      .yMin = this->txt_start.y
     };
     this->clr_region(clr_region);
