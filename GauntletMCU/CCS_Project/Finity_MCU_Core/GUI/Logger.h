@@ -9,6 +9,7 @@
 #define GUI_LOGGER_H_
 
 
+#include <cstring>
 #include <GUI/Window.h>
 
 class Logger : public Window {
@@ -18,8 +19,11 @@ public:
     virtual void print(int n);
     virtual void init();
 private:
+    short txt_height;
     Cord2S txt_start;
     Cord2S prompt_start;
+    uint8_t prompt_cnt;
+    int8_t prompt_str[];
 };
 
 

@@ -20,6 +20,15 @@ FG_GUI::FG_GUI(Cord2S loc, Cord2S dim) : Window(&g_sContext, loc, dim)
      .x = static_cast<short>(Graphics_getDisplayWidth(this->getContext())),
      .y = static_cast<short>(Graphics_getDisplayHeight(this->getContext()))
     };
+
+    Cord2S locs[Element_Cnt];
+
+    locs[State_Tracker].x = 0;
+    locs[State_Tracker].y = 0;
+
+
+    Cord2S sizes[Element_Cnt];
+
     Logger logger = Logger();
     State_Tracker state_tracker = State_Tracker();
     DeviceDisplay device_display = DeviceDisplay();

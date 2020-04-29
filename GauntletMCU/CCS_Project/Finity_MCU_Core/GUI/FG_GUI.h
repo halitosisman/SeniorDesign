@@ -17,7 +17,13 @@
 extern "C" {
 #endif
 
-extern void FG_GUI_init();
+
+typedef enum {
+    State_Tracker = 0,
+    Device_Display,
+    Logger,
+    Element_Cnt
+} FG_GUI_Elements;
 
 
 class FG_GUI : public Window {
