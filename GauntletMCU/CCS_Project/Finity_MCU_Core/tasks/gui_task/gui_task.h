@@ -8,17 +8,9 @@
 
 #include <stdint.h>
 #include <string.h>
-
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-
-#include "pthread.h"
-#include "configs/Board.h"
-
 #include "tasks/FGtask.h"
+#include "configs/Board.h"
 #include "GUI/FG_GUI.h"
-
 #include "state.h"
 
 #define SL_TASK_STACK_SIZE 2048 // copied from TI's tcpecho example

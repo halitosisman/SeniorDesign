@@ -282,7 +282,18 @@ static bool command_callback(uint8_t event) {
         }
         break;
     case Nav_Right:
+        // TODO double check this with Daniel
         outgoing_state = FG_user_state;
+        if (FG_user_state.device_type != Device_System &&
+                FG_user_state.selected_command->name_len == KILL_DEVICE_LEN &&
+                strncmp(FG_user_state.selected_command->command, KILL_DEVICE, KILL_DEVICE_LEN) == 0) {
+            if (FG_user_state.selected_device->next != NULL) {
+                FG_user_state.selected_device->next->prev = FG_user_state.selected_device->prev;
+            }
+            if (FG_user_state.selected_device->prev != NULL) {
+                FG_user_state.selected_device->prev->next = FG_user_state.selected_device->next;
+            }
+        }
         FG_user_state.device_type = Device_Motor;
         FG_user_state.selected_command = NULL;
         FG_user_state.selected_device = NULL;

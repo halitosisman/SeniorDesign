@@ -15,30 +15,9 @@ static sem_t sync;
 uint8_t test = 0;
 
 void i2c_int_callback(uint_least8_t index) {
-    //sem_post(&sync);
     test = 1;
 }
-/*
-struct mq_attr i2cbox =
-{
- .mq_maxmsg = 1,
- .mq_msgsize = sizeof(char)
-};
-struct mq_attr netbox =
-{
- .mq_maxmsg = 1,
- .mq_msgsize = sizeof(struct msgQueue)
-};
-struct mq_attr guibox =
-{
- .mq_maxmsg = 1,
- .mq_msgsize = sizeof(char)
-};
-*/
 void i2c_task(void * par) {
-    //((FGthread_arg_t *) par)->mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
-    //((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
-   // ((FGthread_arg_t *) par)->mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
 
     gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
 
@@ -48,14 +27,14 @@ void i2c_task(void * par) {
     {
      .config = FINITY_GAUNTLET_AD7993_CONF,
      .cycle_timer = AD7993_CYCLE_TIMER_T256,
-     .data_high[0] = 0xFFC,
-     .data_high[1] = 0xFFC,
-     .data_high[2] = 0xFFC,
-     .data_high[3] = 0xFFC,
-     .data_low[0] = 1860,
-     .data_low[1] = 1860,
-     .data_low[2] = 1860,
-     .data_low[3] = 1860,
+     .data_high[0] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
+     .data_high[1] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
+     .data_high[2] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
+     .data_high[3] = FINITY_GAUNTLET_AD7993_DATA_HIGH,
+     .data_low[0] = FINITY_GAUNTLET_AD7993_DATA_LOW,
+     .data_low[1] = FINITY_GAUNTLET_AD7993_DATA_LOW,
+     .data_low[2] = FINITY_GAUNTLET_AD7993_DATA_LOW,
+     .data_low[3] = FINITY_GAUNTLET_AD7993_DATA_LOW,
      .hysteresis[0] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
      .hysteresis[1] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
      .hysteresis[2] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
@@ -74,7 +53,6 @@ void i2c_task(void * par) {
     gui_update();
 
     while(1) {
-       // mq_receive(i2c_mailroom, &notify_flags, sizeof(uint8_t), NULL);
         while (test == 0) {
 
         }

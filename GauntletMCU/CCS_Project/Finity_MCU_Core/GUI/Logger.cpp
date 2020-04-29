@@ -15,8 +15,9 @@ Logger::Logger() : Window(&g_sContext, log_loc, default_size)
 {
     Cord2S s =
     {
-     .x = Graphics_getWidthOfDisplay(this->getContext()->display),
-     .y = Graphics_getHeightOfDisplay(this->getContext()->display) - 11 - Graphics_getStringHeight(this->getContext())
+     .x = static_cast<short>(Graphics_getWidthOfDisplay(this->getContext()->display)),
+     .y = static_cast<short>(Graphics_getHeightOfDisplay(this->getContext()->display) -
+                             11 - Graphics_getStringHeight(this->getContext()))
     };
     this->setSize(s);
     this->txt_start = {0, 0};

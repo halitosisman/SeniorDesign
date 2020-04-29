@@ -143,21 +143,6 @@ typedef struct _T_Params {
 
 
 
-/*!
-    \brief          FGcreate_task
-
-    Initializes a FreeRTOS thread in the context of the Finity Gauntlet project.
-
-    \param          T_Params    -   struct containing the FreeRTOS xTaskCreate parameters.
-
-    \return         void
-
-    \note           This function should be used instead of xTaskCreate in the Finity Gauntlet project.
-
-*/
-//void FGcreate_task(T_Params par);
-
-
 #ifdef __cplusplus
 }
 #endif

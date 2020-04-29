@@ -69,33 +69,6 @@ int main(void)
     /* Call driver init functions */
     Board_init();
 
-    // Initialize the thread communication data structures
-//    struct mq_attr i2cbox;
-//    i2cbox.mq_maxmsg = 1;
- //   i2cbox.mq_msgsize = sizeof(char);
-  //  thread_args.mailroom[I2C_THREAD_ID] = mq_open("i2cbox", O_CREAT, 0, &i2cbox);
-
-//    struct mq_attr guibox;
-//    i2cbox.mq_maxmsg = 1;
- //   i2cbox.mq_msgsize = sizeof(char);
- //   thread_args.mailroom[GUI_THREAD_ID] = mq_open("guibox", O_CREAT, 0, &guibox);
-
-//    struct mq_attr netbox;
- //   i2cbox.mq_maxmsg = 10;
- //   i2cbox.mq_msgsize = sizeof(struct msgQueue);
- //   thread_args.mailroom[NET_THREAD_ID] = mq_open("netbox", O_CREAT, 0, &netbox);
-
-    //pthread_barrier_init(&(thread_args.sync[I2C_THREAD_ID]), )
-
-    // Network Thread Initialization
-   /* i2c_arg.pcName = static_cast<char *>("i2c");
-    i2c_arg.pvParameters = &thread_args;
-    i2c_arg.pvTaskCode = i2c_task;
-    i2c_arg.pxCreatedTask = &(thread_args.tasks[I2C_THREAD_ID]);
-    i2c_arg.usStackDepth = I2C_THREAD_STACK_SIZE;
-    i2c_arg.uxPriority = I2C_THREAD_PRIORITY;
-    FGcreate_task(i2c_arg);*/
-
     /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = I2C_THREAD_PRIORITY; // 1
@@ -164,26 +137,9 @@ int main(void)
             ;
         }
     }
-    /*
-    net_arg.pcName = static_cast<char *>("net");
-    net_arg.pvParameters = &thread_args;
-    net_arg.pvTaskCode = net_task;
-    net_arg.pxCreatedTask = &(thread_args.tasks[NET_THREAD_ID]);
-    net_arg.usStackDepth = NET_TASK_STACK_SIZE;
-    net_arg.uxPriority = NET_TASK_SPAWNER_PRIORITY;
-    FGcreate_task(net_arg);
-     */
-    /* gui_arg.pcName = static_cast<char *>("gui");
-    gui_arg.pvParameters = &thread_args;
-    gui_arg.pvTaskCode = gui_task;
-    gui_arg.pxCreatedTask = &(thread_args.tasks[GUI_THREAD_ID]);
-    gui_arg.usStackDepth = GUI_THREAD_STACK_SIZE;
-    gui_arg.uxPriority = GUI_THREAD_PRIORITY;
-    FGcreate_task(gui_arg);*/
-
     /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);
-    priParam.sched_priority = GUI_THREAD_PRIORITY; // 1
+    priParam.sched_priority = GUI_THREAD_PRIORITY;
 
     detachState = PTHREAD_CREATE_DETACHED;
     retc = pthread_attr_setdetachstate(&pAttrs, detachState);

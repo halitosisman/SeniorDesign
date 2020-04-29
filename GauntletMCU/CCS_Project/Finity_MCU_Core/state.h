@@ -9,10 +9,15 @@
 #define TASKS_I2C_TASK_STATE_H_
 
 
+#include <string.h>
 #include <stdint.h>
 #include "tasks/net_task/net_types.h"
 #include "util/uart_term.h"
 #include "util/error_manifest.h"
+
+
+#define KILL_DEVICE "kill"
+#define KILL_DEVICE_LEN 4
 
 
 #ifdef __cplusplus

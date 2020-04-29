@@ -36,6 +36,12 @@
 /* Application includes                                                      */
 #include "client_cbs.h"
 
+#define SYST_PUB_TOPIC "syst/"
+#define SYST_PUB_TOPIC_LEN 5
+
+#define KILL_DEVICE "kill"
+#define KILL_DEVICE_LEN 4
+
 
 #define SL_TASK_STACK_SIZE 2048 // copied from TI's tcpecho example
 #define SPAWN_TASK_PRIORITY 9 // also copied from TI's tcpecho example

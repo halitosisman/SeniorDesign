@@ -9,33 +9,27 @@
 #define TASKS_I2C_TASK_I2C_TASK_H_
 
 
-#define I2C_MAX_BLOCK_TIME_MS 500
-#define ADC_TIMER_ID 0
-
 #include <ti/drivers/GPIO.h>
 #include "tasks/FGtask.h"
 #include "drivers/ADC/ADC7993.h"
-#include "stdio.h"
-#include "timers.h"
 #include "tasks/net_task/net_task.h"
-
 #include "configs/Board.h"
-#include "util/uart_term.h"
-#include "util/error_manifest.h"
-
 #include "state.h"
 
-#include "drivers/LCD/FG_graphics.h"
-#include "GUI/FG_GUI.h" // TODO REMOVE ONCE SMAT IS DONE
 
+#define FINITY_GAUNTLET_AD7993_CONF (AD7993_CONF_CH4_MSK | AD7993_CONF_CH3_MSK | AD7993_CONF_CH2_MSK | \
+                                        AD7993_CONF_CH1_MSK | AD7993_CONF_FLTR_MSK |  AD7993_CONF_ALERT_MSK | \
+                                        AD7993_CONF_BUSY_ALERT_ACTIVE_LOW_MSK | AD7993_CONF_ALERT_RESET_MSK)
+#define FINITY_GAUNTLET_AD7993_HYSTERESIS 4 // units of LSB
+#define FINITY_GAUNTLET_AD7993_DATA_HIGH 0xFFC // about 3V
+#define FINITY_GAUNTLET_AD7993_DATA_LOW 1860 // about 0.3V
+#define FINITY_GAUNTLET_AD7993_I2C_TIMEOUT_TICKS 10000000
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern QueueHandle_t i2c_event_box; // because there's no other way for sl_events to signal net_task
-extern pthread_t i2c_thread;
 
 /*!
     \brief          net_task

@@ -83,8 +83,6 @@ Async_I2C_Handle * AD7993_init(AD7993_Config * AD7993_config) {
     uint8_t ch_config_buf[ADC7993_CH_CNT][3][AD7993_CH_CONF_SIZE];
     I2C_Transaction ch_config[ADC7993_CH_CNT][3];
 
-    //I2C_transferTimeout(AD7993, &config_ADconf, AD7993_Handle.i2c_timeout_ms);
-
     // Initialize data_high, data_low and hysteresis registers for all channels
     uint8_t ch_addr = AD7993_CH_CONFIG_BASE_ADDR;
     for(int i = 0; i < ADC7993_CH_CNT; i++) {

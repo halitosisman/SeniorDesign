@@ -283,21 +283,16 @@ void FG_graphics_init() {
 void FG_graphics_test() {
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
     Graphics_drawPixel(&g_sContext, 10, 5);
-   // vTaskDelay(pdMS_TO_TICKS(1000));
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_RED);
     Graphics_drawLineH(&g_sContext, 10, 300, 10);
-    //vTaskDelay(pdMS_TO_TICKS(1000));
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_LIME);
     Graphics_drawLineV(&g_sContext, 315, 10, 220);
-   // vTaskDelay(pdMS_TO_TICKS(1000));
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_PURPLE);
     Graphics_fillCircle(&g_sContext, 100, 100, 15);
-  //  vTaskDelay(pdMS_TO_TICKS(1000));
 
     int8_t hi[] = "Hello, World!";
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_AQUAMARINE);
     Graphics_drawString(&g_sContext, hi, sizeof(hi) - 1, 10, 200, 1);
-  //  vTaskDelay(pdMS_TO_TICKS(1000));
 
     int8_t checkText[] = "Checkbox!";
 
@@ -315,6 +310,5 @@ void FG_graphics_test() {
      .yPosition = 200
     };
     Graphics_drawCheckBox(&g_sContext, &testBox);
-  //  vTaskDelay(pdMS_TO_TICKS(5000));
     Graphics_clearDisplay(&g_sContext);
 }

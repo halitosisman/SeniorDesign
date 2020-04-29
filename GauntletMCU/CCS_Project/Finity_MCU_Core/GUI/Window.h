@@ -14,7 +14,6 @@
 
 class Window {
 public:
- //   explicit Window(Graphics_Context * context, Cord2S loc);
     explicit Window(Graphics_Context * context, Cord2S loc, Cord2S size);
     virtual void init()=0;
 

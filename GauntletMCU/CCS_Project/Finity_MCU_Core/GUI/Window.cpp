@@ -39,10 +39,10 @@ void Window::clr_region(Graphics_Rectangle region)
 {
     Graphics_Rectangle clr_region =
     {
-     .xMax = this->loc.x + region.xMax + 1,
-     .xMin = this->loc.x + region.xMin - 1,
-     .yMax = this->loc.y + region.yMax + 1,
-     .yMin = this->loc.y + region.yMin - 1
+     .xMax = static_cast<short>(this->loc.x + region.xMax + 1),
+     .xMin = static_cast<short>(this->loc.x + region.xMin - 1),
+     .yMax = static_cast<short>(this->loc.y + region.yMax + 1),
+     .yMin = static_cast<short>(this->loc.y + region.yMin - 1)
     };
     Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_BLACK);
     Graphics_fillRectangle(this->getContext(), &clr_region);

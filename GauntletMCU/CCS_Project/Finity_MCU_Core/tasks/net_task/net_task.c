@@ -213,17 +213,32 @@ void publish_command(void * device, struct Command* command)
 {
     if (device == NULL)
     {
-        // System
-        if (command->command[0] == 'u')
+        if ((command->command[0] == 'u') || (command->command[0] == 'k'))
         {
+            // system wide update or  kill
             clean_device_list(&(device_list));
         }
-        MQTTClient_publish(gMqttClient,
-                           (char *) SYSTEM_PUB_TOPIC,
-                           SYSTEM_PUB_TOPIC_LEN,
-                           (char *) command->command,
-                           command->command_len,
-                           MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+
+        if (command->command[0] == 'u')
+        {
+            // System
+            MQTTClient_publish(gMqttClient,
+                               (char *) SYSTEM_PUB_TOPIC,
+                               SYSTEM_PUB_TOPIC_LEN,
+                               (char *) command->command,
+                               command->command_len,
+                               MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+        }
+        else
+        {
+            // Syst
+            MQTTClient_publish(gMqttClient,
+                               (char *) SYST_PUB_TOPIC,
+                               SYST_PUB_TOPIC_LEN,
+                               (char *) command->command,
+                               command->command_len,
+                               MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
+        }
     }
     else
     {
@@ -236,6 +251,7 @@ void publish_command(void * device, struct Command* command)
                            MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
     }
 }
+
 
 void add_command(struct Command* head, char * name, int name_len, char * ID, char * command_name, int command_len)
 {
@@ -274,6 +290,7 @@ void init_command_list()
     add_command(L, "Set On", 7, "L__", LIGHT_SET_ON, LIGHT_SET_ON_LEN);
     add_command(L, "Set Off", 8, "L__", LIGHT_SET_OFF, LIGHT_SET_OFF_LEN);
     add_command(L, "Reset Status", 13, "L__", LIGHT_RESET_STATUS, LIGHT_RESET_STATUS_LEN);
+    add_command(L, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// Dimmable
     struct Command* LD = (struct Command*) malloc(sizeof(struct Command));
@@ -295,6 +312,7 @@ void init_command_list()
     add_command(LD, "Dim", 4, "LD_", LIGHT_DIM, LIGHT_DIM_LEN);
     add_command(LD, "Brighten", 9, "LD_", LIGHT_BRIGHTEN, LIGHT_BRIGHTEN_LEN);
     add_command(LD, "Set Brighten", 13, "LD_", LIGHT_SET_BRIGHTNESS, LIGHT_SET_BRIGHTNESS_LEN);
+    add_command(LD, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
     //////////
 
 
@@ -313,6 +331,7 @@ void init_command_list()
     add_command(M, "Set Forward", 12, "M__", MOTOR_SET_FORWARD, MOTOR_SET_FORWARD_LEN);
     add_command(M, "Set Off", 8, "M__", MOTOR_SET_OFF, MOTOR_SET_OFF_LEN);
     add_command(M, "Reset Status", 13, "M__", MOTOR_RESET_STATUS, MOTOR_RESET_STATUS_LEN);
+    add_command(M, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// - Reversable
     struct Command* MR = (struct Command*) malloc(sizeof(struct Command));
@@ -329,6 +348,7 @@ void init_command_list()
     add_command(MR, "Set Off", 8, "M__", MOTOR_SET_OFF, MOTOR_SET_OFF_LEN);
     add_command(MR, "Set Backwards", 14, "MR_", MOTOR_SET_BACKWARDS, MOTOR_SET_BACKWARDS_LEN);
     add_command(MR, "Reset Status", 13, "M__", MOTOR_RESET_STATUS, MOTOR_RESET_STATUS_LEN);
+    add_command(MR, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// - Setable
     struct Command* MS = (struct Command*) malloc(sizeof(struct Command));
@@ -350,6 +370,7 @@ void init_command_list()
     add_command(MS, "Slow Down", 10, "M_S", MOTOR_SLOW, MOTOR_SLOW_LEN);
     add_command(MS, "Speed Up", 9, "M_S", MOTOR_SPEED, MOTOR_SPEED_LEN);
     add_command(MS, "Set Speed", 10, "M_S", MOTOR_SET_SPEED, MOTOR_SET_SPEED_LEN);
+    add_command(MS, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// - Reversable Setable
     struct Command* MRS = (struct Command*) malloc(sizeof(struct Command));
@@ -372,6 +393,7 @@ void init_command_list()
     add_command(MRS, "Slow Down", 10, "M_S", MOTOR_SLOW, MOTOR_SLOW_LEN);
     add_command(MRS, "Speed Up", 9, "M_S", MOTOR_SPEED, MOTOR_SPEED_LEN);
     add_command(MRS, "Set Speed", 10, "M_S", MOTOR_SET_SPEED, MOTOR_SET_SPEED_LEN);
+    add_command(MRS, "Kill Device", 12, "L__", KILL_DEVICE, KILL_DEVICE_LEN);
     //////////
 
     //Accel
@@ -389,6 +411,7 @@ void init_command_list()
     add_command(A, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
     add_command(A, "Set Off", 8, "A__", ACCEL_SET_OFF, ACCEL_SET_OFF_LEN);
     add_command(A, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
+    add_command(A, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// - Setable
     struct Command* AF = (struct Command*) malloc(sizeof(struct Command));
@@ -404,6 +427,7 @@ void init_command_list()
     add_command(AF, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
     add_command(AF, "Set Off", 8, "A__", ACCEL_SET_OFF, ACCEL_SET_OFF_LEN);
     add_command(AF, "Set Freq", 9, "AF_", ACCEL_SET_FREQ, ACCEL_SET_FREQ_LEN);
+    add_command(AF, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
     //////////
 
     //Temp
@@ -420,6 +444,7 @@ void init_command_list()
 
     add_command(T, "Set On", 7, "T__", TEMP_SET_ON, TEMP_SET_ON_LEN);
     add_command(T, "Set Off", 8, "T__", TEMP_SET_OFF, TEMP_SET_OFF_LEN);
+    add_command(T, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
 
     ////////// - Setable
@@ -436,6 +461,7 @@ void init_command_list()
     add_command(TF, "Set On", 7, "T__", TEMP_SET_ON, TEMP_SET_ON_LEN);
     add_command(TF, "Set Off", 8, "T__", TEMP_SET_OFF, TEMP_SET_OFF_LEN);
     add_command(TF, "Set Freq", 9, "TF_", TEMP_SET_FREQ, TEMP_SET_FREQ_LEN);
+    add_command(TF, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
     //////////
 
     //System
@@ -452,6 +478,7 @@ void init_command_list()
 
     add_command(S, "Reset All Devices", 18, "S__", SYSTEM_RESET_STATUS, SYSTEM_RESET_STATUS_LEN);
     add_command(S, "Update All Devices", 19, "S__", SYSTEM_UPDATE, SYSTEM_UPDATE_LEN);
+    add_command(S, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
     //////////
 }
 
