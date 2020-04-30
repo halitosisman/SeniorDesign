@@ -19,7 +19,7 @@ Logger::Logger(Cord2S log_loc, Cord2S default_size, char * prompt) : Window(&g_s
 
     prompt_width = Graphics_getStringWidth(this->getContext(), this->prompt_str, this->prompt_cnt);
     txt_height = this->get_string_height();
-    txt_loc = static_cast<short>((this->getSize().y - txt_height) / 2 + txt_height);
+    txt_loc = static_cast<short>((this->getSize().y - txt_height) / 2);
     this->txt_start = {static_cast<short>(prompt_width), txt_loc};
     this->prompt_start = {0, txt_loc};
 }

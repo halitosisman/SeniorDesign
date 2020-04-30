@@ -386,14 +386,14 @@ void init_command_list()
 
     ////////// - Reversable Setable
     struct Command* MRS = (struct Command*) malloc(sizeof(struct Command));
-    strcpy(MS->name, "Get Status");
+    strcpy(MRS->name, "Get Status");
     MRS->name_len = 11;
     strcpy(MRS->ID, "M__");
     strcpy(MRS->command, MOTOR_GET_STATUS);
     MRS->command_len = MOTOR_GET_STATUS_LEN;
     MRS->prev = NULL;
     MRS->next = NULL;
-    command_list.MRS = MS;
+    command_list.MRS = MRS;
 
     add_command(MRS, "Set Forward", 12, "M__", MOTOR_SET_FORWARD, MOTOR_SET_FORWARD_LEN);
     add_command(MRS, "Set Off", 8, "M__", MOTOR_SET_OFF, MOTOR_SET_OFF_LEN);
@@ -422,7 +422,6 @@ void init_command_list()
 
     add_command(A, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
     add_command(A, "Set Off", 8, "A__", ACCEL_SET_OFF, ACCEL_SET_OFF_LEN);
-    add_command(A, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
     add_command(A, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// - Setable

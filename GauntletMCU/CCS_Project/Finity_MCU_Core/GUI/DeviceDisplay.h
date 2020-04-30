@@ -25,10 +25,7 @@ typedef enum {
     Element_ID,
     Element_Name,
     Element_Special_Type,
-    Element_Special_Status,
     Element_Special_Type2,
-    Element_Special_Status2,
-    Element_Status_Static,
     Element_Status_Current,
     Element_Count
 } Device_Elements;
@@ -44,12 +41,15 @@ public:
     virtual void update_device_info(FG_State*);
     virtual void init();
 protected:
-    virtual void build_entry(char* label, uint8_t ll, char* data, uint8_t ld, Device_Elements i);
-    virtual void write_element(char * label, Device_Elements i);
-    virtual void write_elementn(char * label, uint8_t n, Device_Elements i);
+    virtual uint8_t build_entry(char* label, uint8_t ll, char* data, uint8_t ld, Device_Elements i);
+    virtual uint8_t write_element(char * label, Device_Elements i);
+    virtual uint8_t write_elementn(char * label, uint8_t n, Device_Elements i);
+    virtual void refresh();
+    virtual void refresh_status();
 private:
     Window elements[Element_Count];
     char buf[Element_Count][ELEMENT_MAX_CHAR_CNT];
+    uint8_t buf_len[Element_Count];
     Cord2S centers[Element_Count];
 };
 

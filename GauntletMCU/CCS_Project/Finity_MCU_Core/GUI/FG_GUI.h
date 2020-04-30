@@ -24,6 +24,7 @@ public:
     virtual ~FG_GUI();
     virtual void update_state(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3);
     virtual void update_device_status(FG_State* state);
+    virtual void clear_device_status();
     virtual void update_device_info(FG_State* state);
     virtual void init();
 private:

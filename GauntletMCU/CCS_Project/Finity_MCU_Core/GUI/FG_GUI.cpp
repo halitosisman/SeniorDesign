@@ -33,7 +33,7 @@ FG_GUI::FG_GUI(Cord2S loc, Cord2S dim) : Window(&g_sContext, loc, dim)
     Cord2S logger_size =
     {
      .x = display_width,
-     .y = static_cast<short>(display_height - 11 - Graphics_getStringHeight(this->getContext()))
+     .y = static_cast<short>(Graphics_getStringHeight(this->getContext()) + 11)
     };
 
     Cord2S logger_pos = {0, static_cast<short>(display_height - logger_size.y - 1)};
@@ -79,4 +79,9 @@ void FG_GUI::init()
     this->logger.init();
     this->state_tracker.init();
     this->device_display.init();
+}
+
+void FG_GUI::clear_device_status()
+{
+    this->device_display.clear();
 }
