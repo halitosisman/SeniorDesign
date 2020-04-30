@@ -18,7 +18,6 @@ void i2c_int_callback(uint_least8_t index) {
     test = 1;
 }
 void i2c_task(void * par) {
-
     gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
 
     sem_init(&sync, 0, 0);
