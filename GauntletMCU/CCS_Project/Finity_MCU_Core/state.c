@@ -285,7 +285,6 @@ static bool command_callback(uint8_t event) {
         // TODO double check this with Daniel
         outgoing_state = FG_user_state;
         if (FG_user_state.device_type != Device_System &&
-                FG_user_state.selected_command->name_len == KILL_DEVICE_LEN &&
                 strncmp(FG_user_state.selected_command->command, KILL_DEVICE, KILL_DEVICE_LEN) == 0) {
             if (FG_user_state.selected_device->next != NULL) {
                 FG_user_state.selected_device->next->prev = FG_user_state.selected_device->prev;
@@ -293,6 +292,25 @@ static bool command_callback(uint8_t event) {
             if (FG_user_state.selected_device->prev != NULL) {
                 FG_user_state.selected_device->prev->next = FG_user_state.selected_device->next;
             }
+            if (FG_user_state.selected_device->prev == NULL && FG_user_state.selected_device->next == NULL){
+                switch (FG_user_state.device_type){
+                    case Device_Light:
+                        device_list.Light = NULL;
+                        break;
+                    case Device_Motor:
+                        device_list.Motor = NULL;
+                        break;
+                    case Device_Accel:
+                        device_list.Accel = NULL;
+                        break;
+                    case Device_Temp:
+                        device_list.Temp = NULL;
+                        break;
+                }
+
+            }
+
+            free(FG_user_state.selected_device);
         }
         FG_user_state.device_type = Device_Motor;
         FG_user_state.selected_command = NULL;

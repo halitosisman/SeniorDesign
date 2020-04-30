@@ -42,6 +42,9 @@
 #define KILL_DEVICE "kill"
 #define KILL_DEVICE_LEN 4
 
+#define CLEAR_COMMAND " "
+#define CLEAR_COMMAND_LEN 1
+
 
 #define SL_TASK_STACK_SIZE 2048 // copied from TI's tcpecho example
 #define SPAWN_TASK_PRIORITY 9 // also copied from TI's tcpecho example

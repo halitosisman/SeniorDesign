@@ -11,11 +11,12 @@
 #include <cstdarg>
 #include <GUI/Window.h>
 
-class State_Tracker : public Window
+class StateTracker : public Window
 {
 public:
-    State_Tracker();
-    virtual ~State_Tracker();
+    StateTracker();
+    StateTracker(Cord2S log_loc, Cord2S default_size);
+    virtual ~StateTracker();
     virtual void update(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3);
     virtual void init();
 private:
