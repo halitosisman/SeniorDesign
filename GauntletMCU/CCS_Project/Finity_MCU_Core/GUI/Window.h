@@ -14,8 +14,9 @@
 
 class Window {
 public:
+    Window();
     explicit Window(Graphics_Context * context, Cord2S loc, Cord2S size);
-    virtual void init()=0;
+    virtual void init();
 
     virtual Graphics_Context * getContext();
     virtual void setContext(Graphics_Context * context);
@@ -24,6 +25,8 @@ public:
     virtual void setSize(Cord2S s);
     virtual Cord2S getSize();
     virtual void clear();
+    virtual short get_string_height();
+    virtual Cord2S get_local_center();
 protected:
     virtual Cord2D transform_cord(int32_t x, int32_t y);
     virtual void drawString(int8_t *string, int32_t lLength, int32_t x, int32_t y, bool opaque);

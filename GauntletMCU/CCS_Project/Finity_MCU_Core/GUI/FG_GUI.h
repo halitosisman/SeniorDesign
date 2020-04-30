@@ -18,22 +18,17 @@ extern "C" {
 #endif
 
 
-typedef enum {
-    State_Tracker = 0,
-    Device_Display,
-    Logger,
-    Element_Cnt
-} FG_GUI_Elements;
-
-
 class FG_GUI : public Window {
 public:
     explicit FG_GUI(Cord2S loc, Cord2S dim);
     virtual ~FG_GUI();
     virtual void update_state(int8_t * s1, uint8_t c1, int8_t * s2, uint8_t c2, int8_t * s3, uint8_t c3);
+    virtual void update_device_status(FG_State* state);
+    virtual void update_device_info(FG_State* state);
+    virtual void init();
 private:
     Logger logger;
-    State_Tracker state_tracker;
+    StateTracker state_tracker;
     DeviceDisplay device_display;
 };
 

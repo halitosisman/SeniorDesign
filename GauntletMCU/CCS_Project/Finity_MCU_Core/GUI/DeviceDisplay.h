@@ -12,8 +12,12 @@
 #include <cstdarg>
 #include <cstdint>
 #include <GUI/Window.h>
+#include <GUI/Logger.h>
 
 #include "state.h"
+
+
+#define ELEMENT_MAX_CHAR_CNT 25
 
 
 typedef enum {
@@ -34,14 +38,19 @@ class DeviceDisplay : public Window
 {
 public:
     DeviceDisplay();
+    explicit DeviceDisplay(Cord2S log_loc, Cord2S default_size);
     virtual ~DeviceDisplay();
     virtual void update_status(FG_State*);
     virtual void update_device_info(FG_State*);
     virtual void init();
+protected:
+    virtual void build_entry(char* label, uint8_t ll, char* data, uint8_t ld, Device_Elements i);
+    virtual void write_element(char * label, Device_Elements i);
+    virtual void write_elementn(char * label, uint8_t n, Device_Elements i);
 private:
-    Cord2D locs[Element_Count];
-    Cord2D s_size;
-    uint8_t s_count;
+    Window elements[Element_Count];
+    char buf[Element_Count][ELEMENT_MAX_CHAR_CNT];
+    Cord2S centers[Element_Count];
 };
 
 #endif /* GUI_DEVICEDISPLAY_H_ */

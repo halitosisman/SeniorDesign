@@ -14,7 +14,8 @@
 
 class Logger : public Window {
 public:
-    explicit Logger(Cord2S log_loc, Cord2S default_size);
+    Logger();
+    explicit Logger(Cord2S log_loc, Cord2S default_size, char * prompt);
     virtual void print(int8_t * str, int size);
     virtual void print(int n);
     virtual void init();
@@ -23,7 +24,7 @@ private:
     Cord2S txt_start;
     Cord2S prompt_start;
     uint8_t prompt_cnt;
-    int8_t prompt_str[];
+    int8_t prompt_str[20];
 };
 
 

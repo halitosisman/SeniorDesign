@@ -8,26 +8,20 @@
 #include <GUI/Logger.h>
 
 
-Logger::Logger(Cord2S log_loc, Cord2S default_size) : Window(&g_sContext, log_loc, default_size)
+Logger::Logger(Cord2S log_loc, Cord2S default_size, char * prompt) : Window(&g_sContext, log_loc, default_size)
 {
     int32_t prompt_width = 0;
     this->txt_height = 0;
     short txt_loc = 0;
-    short txt_offset = 5;
-    Cord2S s =
-    {
-     .x = static_cast<short>(Graphics_getWidthOfDisplay(this->getContext()->display)),
-     .y = static_cast<short>(Graphics_getHeightOfDisplay(this->getContext()->display) -
-                             11 - Graphics_getStringHeight(this->getContext()))
-    };
-    this->setSize(s);
-    this->prompt_cnt = strcpy((char *)(this->prompt_str), (char *)("## "));
+
+    this->prompt_cnt = strlen(prompt);
+    strcpy((char *)(this->prompt_str), prompt);
 
     prompt_width = Graphics_getStringWidth(this->getContext(), this->prompt_str, this->prompt_cnt);
-    txt_height = static_cast<short>(Graphics_getStringHeight(this->getContext()));
+    txt_height = this->get_string_height();
     txt_loc = static_cast<short>((this->getSize().y - txt_height) / 2 + txt_height);
-    this->txt_start = {static_cast<short>(txt_offset + prompt_width), txt_loc};
-    this->prompt_start = {txt_offset, txt_loc};
+    this->txt_start = {static_cast<short>(prompt_width), txt_loc};
+    this->prompt_start = {0, txt_loc};
 }
 
 void Logger::print(int8_t * str, int size)
@@ -52,5 +46,9 @@ void Logger::init()
 }
 
 void Logger::print(int n)
+{
+}
+
+Logger::Logger()
 {
 }
