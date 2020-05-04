@@ -11,12 +11,13 @@
 #include "drivers/LCD/FG_graphics.h"
 
 
+// GPIO data registers
 static volatile uint32_t * const wrx = (uint32_t *) (GPIOA0_BASE + LCD_WRX_MSK);
 static volatile uint32_t * const dcx = (uint32_t *) (GPIOA0_BASE + LCD_DCX_MSK);
 static volatile uint32_t * const data_30 = (uint32_t *) (GPIOA1_BASE + LCD_D30_MSK);
 static volatile uint32_t * const data_74 = (uint32_t *) (GPIOA0_BASE + LCD_D74_MSK);
 
-
+// grlib callbacks
 static void pfnPixelDraw(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, uint16_t ulValue);
 static void pfnPixelDrawMultiple(const Graphics_Display * pDisplay, int16_t lX, int16_t lY, int16_t lX0, int16_t lCount,
                           int16_t lBPP, const uint8_t * pucData, const uint32_t * pucPalette);
@@ -28,6 +29,7 @@ static void pfnFlush(const Graphics_Display * pDisplay);
 static void pfnClearDisplay(const Graphics_Display * pDisplay, uint16_t ulValue);
 
 
+// A bunch of the grlib stuff is initialized here
 static Graphics_Display_Functions FGG_Functions =
 {
      .pfnPixelDraw = pfnPixelDraw,
@@ -75,14 +77,14 @@ inline void set_dcx(uint8_t val) {
 void ILI_write_bulk(uint8_t * buf, uint16_t cnt) {
 
     for(int i = 0; i < cnt; i++) {
-        *data_30 = buf[i];
+        *data_30 = buf[i]; // write
         *data_74 = buf[i];
-        *wrx = 0xFF;
+        *wrx = 0xFF; // clock high
 
-        __asm("    nop");
+        __asm("    nop"); // Wait for clk/data lines to stop panicking
         __asm("    nop");
 
-        *wrx = 0x0;
+        *wrx = 0x0; // clock low
     }
 }
 

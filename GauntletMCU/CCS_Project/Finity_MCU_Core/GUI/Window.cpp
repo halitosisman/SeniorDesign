@@ -89,3 +89,22 @@ void Window::drawStringCentered(int8_t* string, int32_t lLength, int32_t x, int3
     Cord2D c = this->transform_cord(x, y);
     Graphics_drawStringCentered(this->context, string, lLength, c.x, c.y, opaque);
 }
+
+short Window::get_string_height()
+{
+    return static_cast<short>(Graphics_getStringHeight(this->getContext()));
+}
+
+Cord2S Window::get_local_center()
+{
+    Cord2S c = {static_cast<short>(this->getSize().x / 2), static_cast<short>(this->getSize().y / 2)};
+    return c;
+}
+
+void Window::init()
+{
+}
+
+Window::Window()
+{
+}

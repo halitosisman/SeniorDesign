@@ -8,7 +8,7 @@
 
 #include "lcd.h"
 
-
+// These hold values that are frequently written to the LCD.
 LCD_CFG pg_set =
 {
      .cmd = ILI9341_PAGEADDRSET,
@@ -76,7 +76,12 @@ static LCD_CFG vcom2 =
 static LCD_CFG memctrl =
 {
      .cmd = ILI9341_MEMCONTROL,
+
+     /*
+      * Makes row indices correspond to the 240 pixel side of the display.
+      */
      .data[0] = ILI9341_MADCTL_BGR | ILI9341_MADCTL_MV,
+
      .tag = ONE_BYTE_CMD
 };
 

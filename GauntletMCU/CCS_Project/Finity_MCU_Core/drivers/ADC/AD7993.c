@@ -1,13 +1,15 @@
 /*
- * ADC7993.c
+ * AD7993.c
  *
  *  Created on: Apr 19, 2020
  *      Author: halitosisman
  */
 
 
-#include "ADC7993.h"
+#include <drivers/ADC/AD7993.h>
 
+
+// Singleton structs reused by the driver
 
 uint8_t write_conv_buf[] = {AD7993_CONV_1234_ADR};
 uint8_t read_conv_buf[AD7993_CONV_READ_SIZE];
@@ -115,6 +117,7 @@ Async_I2C_Handle * AD7993_init(AD7993_Config * AD7993_config) {
     Async_I2C_enqueue(AD7993, &config_ADconf);
     Async_I2C_enqueue(AD7993, &config_cycle_timer);
 
+    // Dequeues and Processes everything
     int8_t counter = 0;
     while (counter < 2 + 3 * ADC7993_CH_CNT) {
         Async_I2C_process(AD7993);

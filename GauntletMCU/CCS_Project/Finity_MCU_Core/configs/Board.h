@@ -37,7 +37,7 @@
 
 #include "CC3220SF.h"
 
-// GPIO defines
+// LCD GPIO indices
 #define LCD_RDX 0
 #define LCD_WRX 1
 #define LCD_DCX 2
@@ -50,6 +50,7 @@
 #define LCD_D6 9
 #define LCD_D7 10
 
+// Used by TI's UART code
 #define CONFIG_UART_0               0
 
 #ifdef __cplusplus

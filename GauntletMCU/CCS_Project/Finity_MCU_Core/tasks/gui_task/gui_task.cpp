@@ -20,6 +20,7 @@ int32_t fatfs_getFatTime(void) {
 }
 
 
+// Waits for for the i2c thread to signal an update.
 static bool gui_get_update()
 {
     struct timespec ts;
@@ -36,21 +37,24 @@ static bool gui_get_update()
     }
 }
 
+// Default state values
 struct Command empty =
 {
  .name = " ",
  .name_len = sizeof(" ")
 };
-void gui_task(void * par) {
-    gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
-    Logger logger = Logger();
-    State_Tracker state_tracker = State_Tracker();
-    Device_Display device_display = Device_Display();
 
-    FG_GUI_init();
-    logger.init();
-    state_tracker.init();
-    device_display.init();
+void gui_task(void * par) {
+    bool d_status_active = false;
+
+    gui_mailroom = ((FGthread_arg_t *) par)->mailroom[GUI_THREAD_ID];
+
+    FG_graphics_init();
+
+    FG_GUI gui = FG_GUI({0, 0}, {320, 240});
+
+    gui.init();
+
     while (1) {
         struct Command default_command[3] =
         {
@@ -65,7 +69,7 @@ void gui_task(void * par) {
          &(default_command[1]),
          &(default_command[2])
         };
-        pthread_mutex_lock(&list_sync);
+        pthread_mutex_lock(&list_sync); // lock on FG_user_state
         // User is not in the command selection screen
         if (FG_user_state.selected_command != NULL) {
             if (FG_user_state.selected_command->next != NULL) {
@@ -127,14 +131,20 @@ void gui_task(void * par) {
                 break;
             }
         }
-        state_tracker.update((int8_t *)(cmd[0]->name), cmd[0]->name_len,
+        gui.update_state((int8_t *)(cmd[0]->name), cmd[0]->name_len,
                              (int8_t *)(cmd[1]->name), cmd[1]->name_len,
                              (int8_t *)(cmd[2]->name), cmd[2]->name_len);
-        if(FG_user_state.selected_command != NULL) {
-            device_display.update_status(&(FG_user_state));
+        if(FG_user_state.selected_command != NULL && FG_user_state.device_type != Device_System) {
+            gui.update_device_status(&(FG_user_state));
+            d_status_active = true;
         }
         else if (FG_user_state.selected_device != NULL) {
-            device_display.update_device_info(&(FG_user_state));
+            gui.update_device_info(&(FG_user_state));
+            d_status_active = true;
+        }
+        else if (d_status_active) {
+            gui.clear_device_status();
+            d_status_active = false;
         }
         pthread_mutex_unlock(&list_sync);
     }
