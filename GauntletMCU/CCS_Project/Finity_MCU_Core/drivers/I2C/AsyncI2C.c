@@ -49,6 +49,7 @@ Async_I2C_Handle * Async_I2C_open(I2C_BitRate bitRate, uint32_t timeout)
         }
     }
 
+    // Initialize device parameters.
     device->i2c_handle = peripheral;
     sem_init(&(device->i2c_lock), 0, 0);
     sem_post(&(device->i2c_lock));
@@ -62,6 +63,7 @@ Async_I2C_Handle * Async_I2C_open(I2C_BitRate bitRate, uint32_t timeout)
     i2cqueue.mq_msgsize = sizeof(I2C_Transaction *);
     device->pending = mq_open("pending", O_CREAT | O_NONBLOCK, 0, &i2cqueue);
     device->completed = mq_open("completed", O_CREAT | O_NONBLOCK, 0, &i2cqueue);
+
     return device;
 }
 

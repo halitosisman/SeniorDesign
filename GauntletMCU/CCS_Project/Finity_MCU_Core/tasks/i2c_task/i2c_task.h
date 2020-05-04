@@ -11,7 +11,7 @@
 
 #include <ti/drivers/GPIO.h>
 #include "tasks/FGtask.h"
-#include "drivers/ADC/ADC7993.h"
+#include "drivers/ADC/AD7993.h"
 #include "tasks/net_task/net_task.h"
 #include "configs/Board.h"
 #include "state.h"

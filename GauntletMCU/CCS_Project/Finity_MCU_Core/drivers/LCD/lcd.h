@@ -54,7 +54,7 @@ extern LCD_CFG mem_write;
 
     More efficient routine for writing command - parameter sequences
 
-    \param          LCD_CMD_t   -   The bytes to be written in order of low index to high
+    \param          LCD_CFG   -   The bytes to be written in order of low index to high
 
     \return         void
 
@@ -63,9 +63,14 @@ extern LCD_CFG mem_write;
 */
 void ILI_cfg(LCD_CFG setting);
 
-
-//void set_draw_window(int16_t lX, int16_t lY, );
+/*!
+ *  @brief  Initializes the LCD
+ */
 void lcd_init();
+
+/*!
+ *  @brief  Clears the LCD.
+ */
 void lcd_clear();
 
 

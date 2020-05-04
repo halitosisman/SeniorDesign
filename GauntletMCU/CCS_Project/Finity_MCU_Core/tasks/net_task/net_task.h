@@ -31,7 +31,6 @@
 #include "tasks/FGtask.h"
 #include "tasks/net_task/net_types.h"
 
-#include "configs/wifi_config.h"
 
 /* Application includes                                                      */
 #include "client_cbs.h"

@@ -81,7 +81,42 @@ extern "C" {
 
 */
 void write8(uint8_t val);
+
+/*!
+    \brief          ILI_write_bulk
+
+    Writes cnt members of buf to the ILI9341. This does not select the address to write to.
+
+    \param          uint8_t *  -   buffer to write.
+
+    \param          uint8_t    -   Number of bytes to write.
+
+    \return         void
+
+    \note           The user needs to define a custom implementation of this for a particular MCU. The FG project has a
+                    implementation of this under lcd_task.c.
+
+*/
 void ILI_write_bulk(uint8_t * buf, uint16_t cnt);
+
+/*!
+    \brief          ILI_write_color
+
+    Writes num instances of the color defined in color to the ILI9341. A different function must select the ILI9341
+    address to write to.
+
+    \param          uint8_t *  -   buffer to write.
+
+    \param          uint8_t    -   The length of the color defined in var color.
+
+    \param          num    -   The number of times to write a color.
+
+    \return         void
+
+    \note           The user needs to define a custom implementation of this for a particular MCU. The FG project has a
+                    implementation of this under lcd_task.c.
+
+*/
 void ILI_write_color(uint8_t * color, uint8_t color_len, int num);
 
 
