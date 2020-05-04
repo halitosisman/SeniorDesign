@@ -9,10 +9,11 @@
 
 #include "i2c_task.h"
 
-static mqd_t gui_mailroom;
+static mqd_t gui_mailroom; // Used to trigger updates on the gui thread.
 
-static sem_t sync;
-uint8_t test = 0;
+static sem_t sync; // Used to sync on the i2c interrupt until I discovered that TI drivers don't like it.
+
+uint8_t test = 0; // Used by the interrupt to signal user input.
 
 void i2c_int_callback(uint_least8_t index) {
     test = 1;
@@ -22,6 +23,7 @@ void i2c_task(void * par) {
 
     sem_init(&sync, 0, 0);
 
+    // setup AD7993 interface
     AD7993_Config FG_AD7993_Handle =
     {
      .config = FINITY_GAUNTLET_AD7993_CONF,
@@ -39,7 +41,6 @@ void i2c_task(void * par) {
      .hysteresis[2] = FINITY_GAUNTLET_AD7993_HYSTERESIS,
      .hysteresis[3] = FINITY_GAUNTLET_AD7993_HYSTERESIS
     };
-
     Async_I2C_Handle * AD7993 = AD7993_init(&FG_AD7993_Handle);
     I2C_Transaction * adc_read;
     GPIO_disableInt(GPIO_I2C_Int);
@@ -48,10 +49,12 @@ void i2c_task(void * par) {
     GPIO_setCallback(GPIO_I2C_Int, i2c_int_callback);
     GPIO_enableInt(GPIO_I2C_Int);
 
+    // Trigger graphics thread initializations. In hindsight I should have probably spawned the graphics thread here.
     init_FG_state();
     gui_update();
 
     while(1) {
+        // Wait for I2C interrupt
         while (test == 0) {
 
         }

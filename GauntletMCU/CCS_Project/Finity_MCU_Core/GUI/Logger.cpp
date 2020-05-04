@@ -19,6 +19,8 @@ Logger::Logger(Cord2S log_loc, Cord2S default_size, char * prompt) : Window(&g_s
 
     prompt_width = Graphics_getStringWidth(this->getContext(), this->prompt_str, this->prompt_cnt);
     txt_height = this->get_string_height();
+
+    // The logger text should be vertically centered and left aligned
     txt_loc = static_cast<short>((this->getSize().y - txt_height) / 2);
     this->txt_start = {static_cast<short>(prompt_width), txt_loc};
     this->prompt_start = {0, txt_loc};
@@ -26,6 +28,7 @@ Logger::Logger(Cord2S log_loc, Cord2S default_size, char * prompt) : Window(&g_s
 
 void Logger::print(int8_t * str, int size)
 {
+    // Clear the window excluding the prompt and re print.
     Cord2S loc = this->getloc();
     Graphics_Rectangle clr_region =
     {
@@ -41,13 +44,11 @@ void Logger::print(int8_t * str, int size)
 
 void Logger::init()
 {
+    // Print the prompt.
     Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
     this->drawString(this->prompt_str, this->prompt_cnt, this->prompt_start.x, this->prompt_start.y, false);
 }
 
-void Logger::print(int n)
-{
-}
 
 Logger::Logger()
 {

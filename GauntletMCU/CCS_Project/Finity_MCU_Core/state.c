@@ -8,7 +8,7 @@
 
 #include "state.h"
 
-
+// States are represented as function callbacks. Each callback finds updats the current state when called.
 static bool device_null_callback(uint8_t event);
 static bool device_light_callback(uint8_t event);
 static bool device_motor_callback(uint8_t event);
@@ -58,6 +58,8 @@ void init_FG_state()
 // corresponds to lower indices
 static bool device_null_callback(uint8_t event) {
     switch (event) {
+
+    // Navigate update up and down the selected device type upon recieving up and down commands.
     case Nav_Up:
         if (FG_user_state.device_type == Device_Null + 1) {
         }
@@ -83,6 +85,8 @@ static bool device_null_callback(uint8_t event) {
                 present_callback = state_callbacks[Device_Null];
             }
             break;
+
+        // Change the state to the callback corresponding to the selected device type.
         case Device_Motor:
             if (device_list.Motor != NULL) {
                 FG_user_state.selected_device = (struct Device *)(device_list.Motor);
@@ -119,6 +123,8 @@ static bool device_null_callback(uint8_t event) {
             ERR_PRINT(LOGIC_ERROR);
         }
         break;
+
+    // This is the far left side of the user menu.
     case Nav_Left:
         break;
     default:
@@ -131,6 +137,8 @@ static bool device_null_callback(uint8_t event) {
 static bool device_light_callback(uint8_t event) {
     struct Light * temp;
     switch (event) {
+
+    // Navigate up and down the linked list holding all specific devices.
     case Nav_Up:
         if ((struct Light *)(FG_user_state.selected_device)->next != NULL) {
             FG_user_state.selected_device = FG_user_state.selected_device->next;
@@ -141,6 +149,8 @@ static bool device_light_callback(uint8_t event) {
             FG_user_state.selected_device = FG_user_state.selected_device->prev;
         }
         break;
+
+    // Go into the command list for a specific device.
     case Nav_Right:
         temp = (struct Light *)(FG_user_state.selected_device);
         if (temp->dimmable) {
@@ -151,6 +161,8 @@ static bool device_light_callback(uint8_t event) {
         }
         present_callback = state_callbacks[Device_Command];
         break;
+
+    // Go back to device type selection screen.
     case Nav_Left:
         FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
@@ -161,6 +173,8 @@ static bool device_light_callback(uint8_t event) {
     outgoing_state = FG_user_state;
     return false;
 }
+
+// All device callbacks follow the same format as light.
 
 static bool device_motor_callback(uint8_t event) {
     struct Motor * temp;
@@ -269,6 +283,9 @@ static bool device_temp_callback(uint8_t event) {
     outgoing_state = FG_user_state;
     return false;
 }
+
+// The user chooses a command in this state.
+// Note that since there is only one system, selecting device type system sends the state machine straight here.
 static bool command_callback(uint8_t event) {
     switch (event) {
     case Nav_Up:
@@ -282,10 +299,10 @@ static bool command_callback(uint8_t event) {
         }
         break;
     case Nav_Right:
-        // TODO double check this with Daniel
         outgoing_state = FG_user_state;
-        if (FG_user_state.device_type != Device_System &&
+        if (FG_user_state.device_type != Device_System && // If kill command
                 strncmp(FG_user_state.selected_command->command, KILL_DEVICE, KILL_DEVICE_LEN) == 0) {
+            // Remove device from linked list of devices and free it.
             if (FG_user_state.selected_device->next != NULL) {
                 FG_user_state.selected_device->next->prev = FG_user_state.selected_device->prev;
             }
@@ -312,12 +329,14 @@ static bool command_callback(uint8_t event) {
 
             free(FG_user_state.selected_device);
         }
+        // The user has selected a command, reset state machine to start.
         FG_user_state.device_type = Device_Motor;
         FG_user_state.selected_command = NULL;
         FG_user_state.selected_device = NULL;
         present_callback = state_callbacks[Device_Null];
-        return true; // no state update, but trigger action
+        return true; // user command selected.
     case Nav_Left:
+        // Go back a menu layer.
         FG_user_state.selected_command = NULL;
         if (FG_user_state.device_type == Device_System) {
             FG_user_state.selected_device = NULL;

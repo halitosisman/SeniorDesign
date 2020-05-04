@@ -20,6 +20,7 @@ int32_t fatfs_getFatTime(void) {
 }
 
 
+// Waits for for the i2c thread to signal an update.
 static bool gui_get_update()
 {
     struct timespec ts;
@@ -36,11 +37,13 @@ static bool gui_get_update()
     }
 }
 
+// Default state values
 struct Command empty =
 {
  .name = " ",
  .name_len = sizeof(" ")
 };
+
 void gui_task(void * par) {
     bool d_status_active = false;
 
@@ -66,7 +69,7 @@ void gui_task(void * par) {
          &(default_command[1]),
          &(default_command[2])
         };
-        pthread_mutex_lock(&list_sync);
+        pthread_mutex_lock(&list_sync); // lock on FG_user_state
         // User is not in the command selection screen
         if (FG_user_state.selected_command != NULL) {
             if (FG_user_state.selected_command->next != NULL) {

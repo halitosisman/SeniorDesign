@@ -45,8 +45,6 @@ typedef enum {
 
 /*!
  *  @brief  Defines the values for the settings registers.
- *
- *  @sa AD7993_init()
  */
 class DeviceDisplay : public Window
 {

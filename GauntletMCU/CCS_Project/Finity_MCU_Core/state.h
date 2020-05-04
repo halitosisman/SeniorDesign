@@ -5,6 +5,12 @@
  *      Author: halitosisman
  */
 
+/*!****************************************************************************
+ *  @file       state.h
+ *  @brief      Handles the finite state machine for the Finity Gauntlet.
+ *
+ *  ***************************************************************************/
+
 #ifndef TASKS_I2C_TASK_STATE_H_
 #define TASKS_I2C_TASK_STATE_H_
 
@@ -24,6 +30,9 @@
 extern "C" {
 #endif
 
+/*!
+ *  @brief  Defines user input directions
+ */
 typedef enum {
     Nav_Up = 0,
     Nav_Down,
@@ -31,6 +40,9 @@ typedef enum {
     Nav_Left
 } Nav;
 
+/*!
+ *  @brief  State machine states.
+ */
 typedef enum {
     Device_Null = 0,
     Device_Light,
@@ -43,17 +55,31 @@ typedef enum {
     Device_Count = State_Count
 } State_List;
 
+/*!
+ *  @brief      Singleton for a Finity Gauntlet state.
+ */
 typedef struct _FG_State {
+    /*!
+     *  The currently selected device type.
+     */
     State_List device_type;
+
+    /*!
+     *   The currently selected command.
+     */
     struct Command * selected_command;
+
+    /*!
+     *  The currently selected device.
+     */
     struct Device * selected_device;
 } FG_State;
 
-extern FG_State outgoing_state;
-extern FG_State FG_user_state;
+extern FG_State outgoing_state; // Sent to the networking and graphics threads when the user sends a command.
+extern FG_State FG_user_state; // The current Finity Gauntlet state.
 
-extern void init_FG_state();
-extern bool update_FG_state(Nav i);
+extern void init_FG_state(); // Starts the state machine
+extern bool update_FG_state(Nav i); // Updates the state machine using the current state and user input.
 
 #ifdef __cplusplus
 }
