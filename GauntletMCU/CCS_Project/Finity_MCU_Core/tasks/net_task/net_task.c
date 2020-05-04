@@ -115,21 +115,21 @@ MQTTClient_Will will_param =
     WILL_RETAIN
 };
 
-//*****************************************************************************
-//
-//! MQTT_SendMsgToQueue - Utility function that receive msgQueue parameter and
-//! tries to push it the queue with minimal time for timeout of 0.
-//! If the queue isn't full the parameter will be stored and the function
-//! will return 0.
-//! If the queue is full and the timeout expired (because the timeout parameter
-//! is 0 it will expire immediately), the parameter is thrown away and the
-//! function will return -1 as an error for full queue.
-//!
-//! \param[in] struct msgQueue *queueElement
-//!
-//! \return 0 on success, -1 on error
-//
-//*****************************************************************************
+/*****************************************************************************
+/
+/! MQTT_SendMsgToQueue - Utility function that receive msgQueue parameter and
+/! tries to push it the queue with minimal time for timeout of 0.
+/! If the queue isn't full the parameter will be stored and the function
+/! will return 0.
+/! If the queue is full and the timeout expired (because the timeout parameter
+/! is 0 it will expire immediately), the parameter is thrown away and the
+/! function will return -1 as an error for full queue.
+/!
+/! \param[in] struct msgQueue *queueElement
+/!
+/! \return 0 on success, -1 on error
+/
+/*****************************************************************************/
 int32_t MQTT_SendMsgToQueue(struct msgQueue *queueElement)
 {
     struct timespec abstime = {0};
@@ -192,25 +192,19 @@ void * MqttClientThread(void * pvParameters)
     return(NULL);
 }
 
-//*****************************************************************************
-//
-//! Task implementing MQTT Server plus client bridge
-//!
-//! This function
-//!    1. Initializes network driver and connects to the default AP
-//!    2. Initializes the mqtt client ans server libraries and set up MQTT
-//!       with the remote broker.
-//!    3. set up the button events and their callbacks(for publishing)
-//!    4. handles the callback signals
-//!
-//! \param  none
-//!
-//! \return None
-//!
-//*****************************************************************************
 
+
+/* Handles MQTT publish request from the I2C
+ * Each linked list is specified to a certain device type
+ * and the special commands of that device type  
+ *
+ * parameters:  none
+ *
+ * return:      none
+ */
 void publish_command(void * device, struct Command* command)
 {
+    // System or Syst Command
     if (device == NULL)
     {
         if ((command->command[0] == 'u') || (command->command[0] == 'k'))
@@ -252,6 +246,7 @@ void publish_command(void * device, struct Command* command)
                                MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
         }
     }
+    // Light, Motor, Accel, or Temp Commmand
     else
     {
         // Device
@@ -264,7 +259,7 @@ void publish_command(void * device, struct Command* command)
     }
 }
 
-
+/* Adds an individual command to the end of the command list */
 void add_command(struct Command* head, char * name, int name_len, char * ID, char * command_name, int command_len)
 {
     struct Command* command = (struct Command*) malloc(sizeof(struct Command));
@@ -285,6 +280,14 @@ void add_command(struct Command* head, char * name, int name_len, char * ID, cha
     command->next = NULL;
 }
 
+/* Initialize the various command lists:
+ * Each linked list is specified to a certain device type
+ * and the special commands of that device type  
+ *
+ * parameters:  none
+ *
+ * return:      none
+ */
 void init_command_list()
 {
     //Light
@@ -386,14 +389,14 @@ void init_command_list()
 
     ////////// - Reversable Setable
     struct Command* MRS = (struct Command*) malloc(sizeof(struct Command));
-    strcpy(MRS->name, "Get Status");
+    strcpy(MS->name, "Get Status");
     MRS->name_len = 11;
     strcpy(MRS->ID, "M__");
     strcpy(MRS->command, MOTOR_GET_STATUS);
     MRS->command_len = MOTOR_GET_STATUS_LEN;
     MRS->prev = NULL;
     MRS->next = NULL;
-    command_list.MRS = MRS;
+    command_list.MRS = MS;
 
     add_command(MRS, "Set Forward", 12, "M__", MOTOR_SET_FORWARD, MOTOR_SET_FORWARD_LEN);
     add_command(MRS, "Set Off", 8, "M__", MOTOR_SET_OFF, MOTOR_SET_OFF_LEN);
@@ -422,6 +425,7 @@ void init_command_list()
 
     add_command(A, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
     add_command(A, "Set Off", 8, "A__", ACCEL_SET_OFF, ACCEL_SET_OFF_LEN);
+    add_command(A, "Set On", 7, "A__", ACCEL_SET_ON, ACCEL_SET_ON_LEN);
     add_command(A, "Kill Device", 12, "___", KILL_DEVICE, KILL_DEVICE_LEN);
 
     ////////// - Setable
@@ -493,31 +497,22 @@ void init_command_list()
     //////////
 }
 
-int valid_command(char *ID, struct Command command)
-{
-    // check type; Light, Motor, Accel, Temp
-    if (ID[0] == command.ID[0])
-    {
-        if ((ID[1] == command.ID[1]) || (command.ID[1] == '_'))
-        {
-            if ((ID[2] == command.ID[1]) || (command.ID[2] == '_'))
-            {
-                //Valid command
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
-
-
+/* Add a new device to device list:
+ * Adds new device based on the the device ID to the device type 
+ * specific linked list 
+ *
+ * parameters:  type - int corresponding to a specific device type 
+ *              new_device - pointer to new device being added 
+ *
+ * return:      none
+ */
 void add_device(int type, void * new_device)
 {
     //Light=0,Motor=1,Accel=2,Temp=3
     struct Light* device_group;
     struct Light* prev_device;
     struct Light* new_device_cast = (struct Light*) new_device;
+    // Device type selection, type cast to Light for convenience 
     switch(type)
     {
         case 0:
@@ -559,15 +554,15 @@ void add_device(int type, void * new_device)
     }
     else
     {
+        //adds device to link list based on device name.
         while (device_group != NULL)
         {
+            // ignore device if device of same type and name already connected
             if (strcmp(device_group->name, new_device_cast->name) == 0)
             {
                 UART_PRINT("Duplicate Device Registration\n\r");
                 break;
             }
-
-
             switch(type)
             {
                 case 0:
@@ -584,6 +579,7 @@ void add_device(int type, void * new_device)
                     break;
             }
 
+            //adds device to link list based on device name.
             if (strcmp(device_group->name, new_device_cast->name) < 0)
             {
                 prev_device = device_group;
@@ -634,7 +630,14 @@ void add_device(int type, void * new_device)
     }
 }
 
-// Update device status
+/* Finds and updates the status of a device based on given type and ID
+ *
+ * parameters:  type - int corresponding to a specific device type 
+ *              id - 8 char string of what device needs their status updated
+ *              status - float of the new status of the device should be update to
+ *
+ * return:      none
+ */
 void find_device(int type, char * id, float status)
 {
     //Light=0,Motor=1,Accel=2,Temp=3
@@ -656,6 +659,7 @@ void find_device(int type, char * id, float status)
             break;
     }
 
+    // Go to first item in list
     if (device_group != NULL)
     {
         while (device_group->prev != NULL)
@@ -664,6 +668,8 @@ void find_device(int type, char * id, float status)
         }
     }
 
+    // Increments through device list and updates status of
+    // the device with the corresponding ID
     while (device_group != NULL)
     {
         if (strcmp(device_group->ID, id) == 0)
@@ -671,21 +677,26 @@ void find_device(int type, char * id, float status)
             device_group->status = status;
             break;
         }
-
         device_group = device_group->next;
     }
 }
 
-// Free one device type
+/* Free entire linked list of connected devices
+ *
+ * parameters:  device - pointer to device linked list being freed 
+ *
+ * return:      none
+ */
 void clean_device_type(void *device)
 {
     if (device != NULL)
     {
+        // Go to first item in list
         while (((struct Light*)device)->prev != NULL)
         {
             device = (void *) ((struct Light*)device)->prev;
         }
-
+        // Free every device in linked list
         while (device != NULL)
         {
             void * prev_device = device;
@@ -695,7 +706,12 @@ void clean_device_type(void *device)
     }
 }
 
-// Free all current stored devices
+/* Free every type of device in the device list and set header to NULL
+ *
+ * parameters:  devices - global device list struct
+ *
+ * return:      none
+ */
 void clean_device_list(struct Device_List* devices)
 {
     clean_device_type(devices->Light);
@@ -709,9 +725,14 @@ void clean_device_list(struct Device_List* devices)
 }
 
 
-
-
-
+/* Main MQTT message processing:
+ * Handles processed MQTT messages, updating registed device statuses
+ * and adding new devices to the registed list
+ *
+ * parameters:  pvParameters - thread parameters
+ *
+ * return:      none
+ */
 void * MqttClient(void *pvParameters)
 {
     struct msgQueue queueElemRecv;
@@ -752,7 +773,6 @@ void * MqttClient(void *pvParameters)
         /*msg received by client from remote broker (on a topic      */
         /*subscribed by local client)                                */
         case MSG_RECV_BY_CLIENT:
-
             tmpBuff = (char *) ((char *) queueElemRecv.msgPtr + 12);
             // status/#
             if(strncmp(tmpBuff, SUBSCRIPTION_TOPIC0, 7) == 0)
@@ -762,7 +782,6 @@ void * MqttClient(void *pvParameters)
 
                 if (strncmp(tmpType, "SPECIAL/", 7) != 0)
                 {
-                    UART_PRINT("\n\rTopic:%s\n\rMsg:%s\n\r\r\n",tmpBuff, tmpBuff + queueElemRecv.topLen + 1);
                     // compnent id
                     char *tmpID = (char *)((char *)tmpType + 6);
 
@@ -771,6 +790,7 @@ void * MqttClient(void *pvParameters)
 
                     float status = strtof(tmpmsg, &end);
 
+                    // finds and updates device status based on device type and ID
                     if (strncmp(tmpType, "light/", 6) == 0)
                     {
                         find_device(0, tmpID, status);
@@ -790,7 +810,7 @@ void * MqttClient(void *pvParameters)
                 }
                 else
                 {
-                    //special case handler
+                    //special case handler for debug and special test cases
                     char * tmpCode = (char *)(tmpBuff + queueElemRecv.topLen + 1);
                     char * end;
 
@@ -801,18 +821,14 @@ void * MqttClient(void *pvParameters)
                     {
                     case 0:
                         //Update connected devices
-                      //  update_devices();
                         break;
                     }
-
                 }
             }
             // new/#
             else if(strncmp(tmpBuff, SUBSCRIPTION_TOPIC1,
                             4) == 0)
             {
-                //UART_PRINT("\n\rTopic:%s\n\rMsg:%s\n\r\r",tmpBuff, tmpBuff + queueElemRecv.topLen + 1);
-
                 // light, motor, accel, tempr
                 char *tmpType = (char *)((char *)tmpBuff + 4);
                 // compnent id
@@ -865,12 +881,14 @@ void * MqttClient(void *pvParameters)
                             ,tmp_Light->name, tmp_Light->ID,
                             dimmable, tmp_Light->pub_topic);
 
+                    // Send newly connected device a connection confirmation
                     MQTTClient_publish(gMqttClient, (char *) tmp_Light->pub_topic,
                                        23,
                                        (char *) LIGHT_CONNECTION_CONFIRM,
                                        LIGHT_CONNECTION_CONFIRM_LEN,
                                        MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
+                    // add device to connected device list
                     add_device(0, tmp_Light);
                 }
                 else if (strncmp(tmpType, "motor/", 6) == 0)
@@ -920,7 +938,7 @@ void * MqttClient(void *pvParameters)
 
                     // Update device Status to default value
                     tmpMotor->status = 0;
-
+                    
                     UART_PRINT("Motor Device Connected\n\r"
                             "Device Name: %s\n\rDevice ID: %s\n\r"
                             "Motor Reversable: %s\n\r"
@@ -929,12 +947,14 @@ void * MqttClient(void *pvParameters)
                             ,tmpMotor->name, tmpMotor->ID,
                             reversable, setable, tmpMotor->pub_topic);
 
+                    // Send newly connected device a connection confirmation
                     MQTTClient_publish(gMqttClient, (char *) tmpMotor->pub_topic,
                                        23,
                                        (char *) MOTOR_CONNECTION_CONFIRM,
                                        MOTOR_CONNECTION_CONFIRM_LEN,
                                        MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
+                    // add device to connected device list
                     add_device(1, tmpMotor);
                 }
                 else if (strncmp(tmpType, "accel/", 6) == 0)
@@ -979,12 +999,14 @@ void * MqttClient(void *pvParameters)
                             ,tmp_Accel->name, tmp_Accel->ID,
                             setable, tmp_Accel->pub_topic);
 
+                    // Send newly connected device a connection confirmation
                     MQTTClient_publish(gMqttClient, (char *) tmp_Accel->pub_topic,
                                        23,
                                        (char *) ACCEL_CONNECTION_CONFIRM,
                                        ACCEL_CONNECTION_CONFIRM_LEN,
                                        MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
+                    // add device to connected device list
                     add_device(2, tmp_Accel);
                 }
                 else if (strncmp(tmpType, "tempr/", 6) == 0)
@@ -1029,12 +1051,14 @@ void * MqttClient(void *pvParameters)
                             ,tmp_Temp->name, tmp_Temp->ID,
                             setable, tmp_Temp->pub_topic);
 
+                    // Send newly connected device a connection confirmation
                     MQTTClient_publish(gMqttClient, (char *) tmp_Temp->pub_topic,
                                        23,
                                        (char *) TEMP_CONNECTION_CONFIRM,
                                        TEMP_CONNECTION_CONFIRM_LEN,
                                        MQTT_QOS_2 | ((RETAIN_ENABLE) ? MQTT_PUBLISH_RETAIN : 0));
 
+                    // add device to connected device list
                     add_device(3, tmp_Temp);
                 }
             }
