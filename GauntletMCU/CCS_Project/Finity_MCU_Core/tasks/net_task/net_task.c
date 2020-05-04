@@ -129,7 +129,7 @@ MQTTClient_Will will_param =
 /!
 /! \return 0 on success, -1 on error
 /
-/*****************************************************************************/
+*****************************************************************************/
 int32_t MQTT_SendMsgToQueue(struct msgQueue *queueElement)
 {
     struct timespec abstime = {0};

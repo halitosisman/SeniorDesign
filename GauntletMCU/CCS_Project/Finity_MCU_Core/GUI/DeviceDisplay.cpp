@@ -229,7 +229,6 @@ DeviceDisplay::DeviceDisplay()
 
 void DeviceDisplay::refresh()
 {
-    Cord2S c;
     Graphics_setForegroundColor(this->getContext(), GRAPHICS_COLOR_DARK_SEA_GREEN);
     for (uint8_t i = 0; i < Element_Status_Current; i++) {
         if (this->buf_len[i] != 0) {
